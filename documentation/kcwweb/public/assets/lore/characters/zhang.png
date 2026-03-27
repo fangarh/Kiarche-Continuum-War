@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <rect width="800" height="500" fill="#1e2138"/>
+  <circle cx="400" cy="180" r="60" fill="none" stroke="#800020" stroke-width="3"/>
+  <path d="M340 350 L460 350 L440 450 L360 450 Z" fill="none" stroke="#800020" stroke-width="2"/>
+  <text x="400" y="400" text-anchor="middle" fill="#800020" font-size="20" font-family="Arial">Чжан</text>
+</svg>

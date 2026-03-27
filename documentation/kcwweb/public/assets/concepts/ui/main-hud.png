@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <rect width="800" height="500" fill="#1a1d2e"/>
+  <rect x="50" y="50" width="700" height="60" rx="8" fill="rgba(128,0,32,0.2)" stroke="#800020" stroke-width="2"/>
+  <rect x="50" y="130" width="200" height="320" rx="8" fill="rgba(128,0,32,0.1)" stroke="#800020" stroke-width="1"/>
+  <rect x="270" y="130" width="480" height="320" rx="8" fill="rgba(160,16,48,0.1)" stroke="#a01030" stroke-width="1"/>
+  <text x="400" y="400" text-anchor="middle" fill="#800020" font-size="20" font-family="Arial">UI Концепт</text>
+</svg>

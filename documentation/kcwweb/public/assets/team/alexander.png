@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#1e2138"/>
+  <circle cx="200" cy="150" r="60" fill="none" stroke="#800020" stroke-width="3"/>
+  <path d="M140 280 L260 280 L240 350 L160 350 Z" fill="none" stroke="#800020" stroke-width="2"/>
+  <text x="200" y="380" text-anchor="middle" fill="#800020" font-size="16" font-family="Arial">Команда</text>
+</svg>

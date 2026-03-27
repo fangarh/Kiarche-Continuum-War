@@ -1,0 +1,180 @@
+.footer {
+  background: rgba(11, 13, 23, 0.95);
+  border-top: 1px solid rgba(107, 70, 193, 0.3);
+  padding: 3rem 2rem 1.5rem;
+  margin-top: 4rem;
+}
+
+.footer-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.5fr 1.5fr;
+  gap: 2rem;
+}
+
+.footer-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.footer-logo .logo-icon {
+  color: #7b2cbf;
+  font-size: 1.5rem;
+}
+
+.footer-tagline {
+  color: #8b8ba7;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.footer-title {
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.footer-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.footer-links a {
+  color: #8b8ba7;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+  color: #6B46C1;
+}
+
+.footer-social {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(107, 70, 193, 0.2);
+  border-radius: 8px;
+  color: #b8b8d1;
+  transition: all 0.2s ease;
+}
+
+.social-link:hover {
+  background: rgba(107, 70, 193, 0.4);
+  color: #fff;
+}
+
+.social-link svg {
+  width: 20px;
+  height: 20px;
+}
+
+.steam-button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(135deg, #1b2838 0%, #2a475e 100%);
+  border-radius: 8px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.steam-button:hover {
+  background: linear-gradient(135deg, #2a475e 0%, #1b2838 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(27, 40, 56, 0.5);
+}
+
+.steam-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.footer-bottom {
+  max-width: 1400px;
+  margin: 2rem auto 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(107, 70, 193, 0.2);
+  text-align: center;
+  color: #5a5a7a;
+  font-size: 0.85rem;
+}
+
+.footer-bottom p {
+  margin: 0.5rem 0;
+}
+
+.footer-disclaimer {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .footer-container {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .footer-section:first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .footer {
+    padding: 2rem 1rem 1rem;
+  }
+
+  .footer-container {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .footer-section {
+    align-items: center;
+    text-align: center;
+  }
+
+  .footer-logo {
+    justify-content: center;
+  }
+
+  .footer-social {
+    justify-content: center;
+  }
+
+  .steam-button {
+    justify-content: center;
+  }
+}

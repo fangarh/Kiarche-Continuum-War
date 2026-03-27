@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(npm install:*)",
+      "Bash(npm list:*)",
+      "Bash(ffprobe -v error -show_entries stream=codec_name,width,height,duration -of default=noprint_wrappers=1 \"D:\\\\Projects\\\\UNITY\\\\Kiarche-Continuum-War\\\\documentation\\\\kcwweb\\\\public\\\\assets\\\\concepts\\\\pixverse-v5-hero.mp4\")"
+    ]
+  }
+}

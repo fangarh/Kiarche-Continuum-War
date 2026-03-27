@@ -1,0 +1,318 @@
+.home {
+  min-height: 100vh;
+}
+
+/* Hero Section */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 2rem;
+  overflow: hidden;
+}
+
+.hero-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.hero-gradient {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(107, 70, 193, 0.3) 0%, rgba(11, 13, 23, 1) 70%);
+  transition: opacity 1.5s ease;
+}
+
+.hero-gradient-2 {
+  background: radial-gradient(ellipse at center, rgba(70, 130, 193, 0.2) 0%, rgba(11, 13, 23, 0.8) 60%);
+  opacity: 0;
+  transition: opacity 1.5s ease;
+}
+
+.hero.video-2-active .hero-gradient {
+  opacity: 0;
+  transition: opacity 1.5s ease;
+}
+
+.hero.video-2-active .hero-gradient-2 {
+  opacity: 1;
+}
+
+.hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+}
+
+.hero-video.active {
+  opacity: 1;
+}
+
+.hero-video.fade-out {
+  opacity: 0;
+}
+
+.hero-particles {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(2px 2px at 20% 30%, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(2px 2px at 60% 70%, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(1px 1px at 50% 50%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 80% 10%, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(2px 2px at 90% 60%, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(1px 1px at 33% 80%, rgba(255, 255, 255, 0.5), transparent);
+  background-size: 200% 200%;
+  animation: particles 30s ease infinite;
+}
+
+@keyframes particles {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  max-width: 900px;
+}
+
+.hero-title {
+  font-size: 5rem;
+  font-weight: 800;
+  margin: 0 0 1rem;
+  background: linear-gradient(135deg, #fff 0%, #9F7AEA 50%, #6B46C1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
+  animation: titleGlow 3s ease-in-out infinite;
+}
+
+@keyframes titleGlow {
+  0%, 100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.2);
+  }
+}
+
+.hero-tagline {
+  font-size: 1.5rem;
+  color: #b8b8d1;
+  margin: 0 0 2.5rem;
+  line-height: 1.6;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.hero-actions .button-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.hero-scroll {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: #8b8ba7;
+  font-size: 0.85rem;
+  animation: scrollBounce 2s ease-in-out infinite;
+}
+
+@keyframes scrollBounce {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(10px);
+  }
+}
+
+.hero-scroll svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* About Preview */
+.about-preview {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.about-content {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 3rem;
+}
+
+.about-text {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #b8b8d1;
+  white-space: pre-line;
+}
+
+.about-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.feature-card {
+  background: rgba(30, 33, 56, 0.5);
+}
+
+/* Gallery More */
+.gallery-more {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+/* Quick Links */
+.quick-links {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.quick-link-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+  background: rgba(30, 33, 56, 0.5);
+  border: 1px solid rgba(107, 70, 193, 0.2);
+  border-radius: 16px;
+  text-decoration: none;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+.quick-link-card:hover {
+  border-color: rgba(107, 70, 193, 0.4);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.quick-link-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.quick-link-card h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.quick-link-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #8b8ba7;
+}
+
+/* CTA Section */
+.cta-section {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.cta-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 1rem;
+}
+
+.cta-text {
+  font-size: 1.1rem;
+  color: #8b8ba7;
+  margin: 0 0 2rem;
+}
+
+.cta-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero {
+    padding: 4rem 1.5rem;
+    min-height: auto;
+    padding-bottom: 6rem;
+  }
+
+  .hero-title {
+    font-size: 2.5rem;
+  }
+
+  .hero-tagline {
+    font-size: 1.1rem;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero-actions .button {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .about-features {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-links {
+    grid-template-columns: 1fr;
+  }
+
+  .cta-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .cta-actions .button {
+    width: 100%;
+    max-width: 300px;
+  }
+}

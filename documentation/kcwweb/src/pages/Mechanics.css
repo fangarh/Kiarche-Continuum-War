@@ -1,0 +1,292 @@
+.mechanics-page {
+  min-height: 100vh;
+}
+
+/* Hero */
+.mechanics-hero {
+  background: linear-gradient(135deg, rgba(107, 70, 193, 0.2) 0%, rgba(11, 13, 23, 1) 100%);
+  padding: 8rem 2rem 4rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(107, 70, 193, 0.2);
+}
+
+.mechanics-hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.mechanics-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin: 0 0 1rem;
+  background: linear-gradient(135deg, #fff 0%, #9F7AEA 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.mechanics-tagline {
+  font-size: 1.25rem;
+  color: #b8b8d1;
+  margin: 0;
+}
+
+/* Section Intro */
+.section-intro {
+  max-width: 800px;
+  margin: 0 auto 2rem;
+  text-align: center;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #b8b8d1;
+}
+
+/* Core Loop */
+.core-loop {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.core-loop-description {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #b8b8d1;
+  margin-bottom: 2rem;
+  white-space: pre-line;
+}
+
+.loop-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.loop-step {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  background: rgba(30, 33, 56, 0.5);
+  border: 1px solid rgba(107, 70, 193, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.loop-step:hover {
+  border-color: rgba(107, 70, 193, 0.4);
+  transform: translateX(4px);
+}
+
+.step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #6B46C1 0%, #553C9A 100%);
+  border-radius: 50%;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.step-content {
+  flex: 1;
+}
+
+.step-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 0.5rem;
+}
+
+.step-description {
+  font-size: 0.95rem;
+  color: #b8b8d1;
+  margin: 0;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+/* Combat */
+.combat-features {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.combat-card {
+  background: rgba(30, 33, 56, 0.6);
+}
+
+/* Progression */
+.progression-types {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.progression-card {
+  background: rgba(30, 33, 56, 0.6);
+}
+
+.max-level {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(107, 70, 193, 0.2);
+}
+
+.level-label {
+  color: #8b8ba7;
+  font-size: 0.9rem;
+}
+
+.level-value {
+  color: #6B46C1;
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+/* Economy */
+.economy-section {
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+}
+
+.economy-section:last-child {
+  margin-bottom: 0;
+}
+
+.economy-subtitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 1.5rem;
+  text-align: center;
+}
+
+.currencies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.currency-card {
+  background: rgba(30, 33, 56, 0.6);
+  text-align: center;
+}
+
+.currency-symbol {
+  display: block;
+  font-size: 3rem;
+  font-weight: 700;
+  color: #ffb703;
+  margin-bottom: 0.5rem;
+}
+
+.resources-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.resource-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem 1.25rem;
+  background: rgba(30, 33, 56, 0.5);
+  border: 1px solid rgba(123, 44, 191, 0.2);
+  border-radius: 8px;
+  border-left-width: 4px;
+}
+
+.resource-common {
+  border-left-color: #8b8ba7;
+}
+
+.resource-rare {
+  border-left-color: #3a86ff;
+}
+
+.resource-legendary {
+  border-left-color: #ffb703;
+}
+
+.resource-name {
+  font-weight: 600;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.resource-type {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #8b8ba7;
+}
+
+.resource-description {
+  font-size: 0.85rem;
+  color: #b8b8d1;
+}
+
+/* UX Principles */
+.ux-principles {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.ux-card {
+  background: rgba(30, 33, 56, 0.6);
+}
+
+.ux-examples {
+  margin: 1rem 0 0;
+  padding: 0 0 0 1.25rem;
+  color: #b8b8d1;
+  font-size: 0.9rem;
+}
+
+.ux-examples li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .mechanics-hero {
+    padding: 6rem 1.5rem 3rem;
+  }
+
+  .mechanics-title {
+    font-size: 2.5rem;
+  }
+
+  .loop-step {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .combat-features,
+  .progression-types,
+  .currencies-grid,
+  .resources-grid,
+  .ux-principles {
+    grid-template-columns: 1fr;
+  }
+}

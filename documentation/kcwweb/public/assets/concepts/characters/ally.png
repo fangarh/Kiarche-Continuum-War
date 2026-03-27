@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <rect width="800" height="500" fill="#1e2138"/>
+  <text x="400" y="240" text-anchor="middle" fill="#800020" font-size="24" font-family="Arial">Концепт-арт</text>
+  <text x="400" y="280" text-anchor="middle" fill="#a01030" font-size="16" font-family="Arial">Персонаж</text>
+</svg>

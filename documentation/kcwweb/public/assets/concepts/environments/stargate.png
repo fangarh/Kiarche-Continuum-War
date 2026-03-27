@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <rect width="800" height="500" fill="#1a1d2e"/>
+  <circle cx="400" cy="250" r="100" fill="none" stroke="#800020" stroke-width="4"/>
+  <circle cx="400" cy="250" r="70" fill="none" stroke="#a01030" stroke-width="3"/>
+  <circle cx="400" cy="250" r="40" fill="rgba(128,0,32,0.2)"/>
+  <text x="400" y="380" text-anchor="middle" fill="#800020" font-size="20" font-family="Arial">Звёздные врата</text>
+  <text x="400" y="410" text-anchor="middle" fill="#8b8ba7" font-size="14" font-family="Arial">Placeholder изображения</text>
+</svg>

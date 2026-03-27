@@ -1,0 +1,269 @@
+.architecture-page {
+  min-height: 100vh;
+}
+
+/* Hero */
+.architecture-hero {
+  background: linear-gradient(135deg, rgba(107, 70, 193, 0.15) 0%, rgba(11, 13, 23, 1) 100%);
+  padding: 8rem 2rem 4rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(107, 70, 193, 0.2);
+}
+
+.architecture-hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.architecture-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin: 0 0 1rem;
+  background: linear-gradient(135deg, #fff 0%, #9F7AEA 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.architecture-tagline {
+  font-size: 1.25rem;
+  color: #b8b8d1;
+  margin: 0;
+}
+
+/* Modules */
+.modules-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.module-card {
+  background: rgba(30, 33, 56, 0.6);
+}
+
+.module-header {
+  margin-bottom: 0.75rem;
+}
+
+.module-path {
+  display: block;
+  font-size: 0.8rem;
+  color: #6B46C1;
+  font-family: 'Courier New', monospace;
+  margin-top: 0.25rem;
+}
+
+.module-dependencies {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(123, 44, 191, 0.2);
+}
+
+.deps-label {
+  display: block;
+  font-size: 0.8rem;
+  color: #8b8ba7;
+  margin-bottom: 0.5rem;
+}
+
+.deps-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.dep-tag {
+  padding: 0.25rem 0.75rem;
+  background: rgba(107, 70, 193, 0.2);
+  border-radius: 20px;
+  font-size: 0.75rem;
+  color: #9F7AEA;
+}
+
+/* Data Flows */
+.dataflows-list {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dataflow-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  background: rgba(30, 33, 56, 0.5);
+  border: 1px solid rgba(123, 44, 191, 0.2);
+  border-radius: 12px;
+}
+
+.dataflow-source,
+.dataflow-target {
+  padding: 0.75rem 1.5rem;
+  background: rgba(123, 44, 191, 0.2);
+  border-radius: 8px;
+  min-width: 150px;
+  text-align: center;
+}
+
+.dataflow-name {
+  font-weight: 600;
+  color: #fff;
+}
+
+.dataflow-connection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dataflow-line {
+  width: 2px;
+  height: 30px;
+  background: #6B46C1;
+}
+
+.dataflow-line.dataflow-sync {
+  background: linear-gradient(to bottom, #6B46C1, #553C9A);
+}
+
+.dataflow-line.dataflow-async {
+  background: linear-gradient(to bottom, #ffb703, #6B46C1);
+}
+
+.dataflow-line.dataflow-event {
+  background: linear-gradient(to bottom, #06d6a0, #6B46C1);
+  border-style: dashed;
+}
+
+.dataflow-type {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dataflow-type.dataflow-sync {
+  color: #3a86ff;
+}
+
+.dataflow-type.dataflow-async {
+  color: #ffb703;
+}
+
+.dataflow-type.dataflow-event {
+  color: #06d6a0;
+}
+
+.dataflow-description {
+  font-size: 0.9rem;
+  color: #b8b8d1;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+/* Diagrams */
+.diagrams-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.diagram-card {
+  background: rgba(30, 33, 56, 0.6);
+}
+
+.diagram-type {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: rgba(107, 70, 193, 0.2);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  color: #9F7AEA;
+  margin-bottom: 0.75rem;
+}
+
+.diagram-placeholder {
+  margin-top: 1rem;
+  padding: 2rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px dashed rgba(123, 44, 191, 0.3);
+  border-radius: 8px;
+  text-align: center;
+  color: #8b8ba7;
+  font-size: 0.9rem;
+}
+
+/* Tech Stack */
+.tech-stack {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+}
+
+.tech-category {
+  text-align: center;
+}
+
+.tech-category-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #6B46C1;
+  margin: 0 0 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tech-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tech-list li {
+  padding: 0.5rem 1rem;
+  background: rgba(30, 33, 56, 0.5);
+  border-radius: 6px;
+  color: #b8b8d1;
+  font-size: 0.95rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .architecture-hero {
+    padding: 6rem 1.5rem 3rem;
+  }
+
+  .architecture-title {
+    font-size: 2.5rem;
+  }
+
+  .modules-grid,
+  .diagrams-grid,
+  .tech-stack {
+    grid-template-columns: 1fr;
+  }
+
+  .dataflow-item {
+    padding: 1rem;
+  }
+
+  .dataflow-source,
+  .dataflow-target {
+    min-width: auto;
+    width: 100%;
+  }
+}

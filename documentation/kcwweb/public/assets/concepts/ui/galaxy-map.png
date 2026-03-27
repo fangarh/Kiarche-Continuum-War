@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <rect width="800" height="500" fill="#0b0d17"/>
+  <circle cx="400" cy="250" r="150" fill="none" stroke="#a01030" stroke-width="1" opacity="0.3"/>
+  <circle cx="400" cy="250" r="100" fill="none" stroke="#a01030" stroke-width="1" opacity="0.5"/>
+  <circle cx="400" cy="250" r="50" fill="none" stroke="#a01030" stroke-width="1" opacity="0.7"/>
+  <circle cx="400" cy="250" r="10" fill="#800020"/>
+  <circle cx="300" cy="200" r="5" fill="#a01030"/>
+  <circle cx="500" cy="300" r="5" fill="#a01030"/>
+  <circle cx="350" cy="350" r="5" fill="#a01030"/>
+  <circle cx="450" cy="150" r="5" fill="#a01030"/>
+  <text x="400" y="450" text-anchor="middle" fill="#800020" font-size="20" font-family="Arial">Карта Галактики</text>
+</svg>

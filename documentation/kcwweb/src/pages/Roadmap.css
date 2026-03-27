@@ -1,0 +1,295 @@
+.roadmap-page {
+  min-height: 100vh;
+}
+
+/* Hero */
+.roadmap-hero {
+  background: linear-gradient(135deg, rgba(107, 70, 193, 0.15) 0%, rgba(11, 13, 23, 1) 100%);
+  padding: 8rem 2rem 4rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(107, 70, 193, 0.2);
+}
+
+.roadmap-hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.roadmap-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin: 0 0 1rem;
+  background: linear-gradient(135deg, #fff 0%, #9F7AEA 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.roadmap-tagline {
+  font-size: 1.25rem;
+  color: #b8b8d1;
+  margin: 0;
+}
+
+/* Phase */
+.phase-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.phase-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.phase-badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: rgba(107, 70, 193, 0.3);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #9F7AEA;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+}
+
+.phase-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 0.5rem;
+}
+
+.phase-description {
+  font-size: 1rem;
+  color: #8b8ba7;
+  margin: 0;
+}
+
+/* Milestones */
+.milestones-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.milestone-card {
+  background: rgba(30, 33, 56, 0.6);
+  border-left-width: 4px;
+  border-left-style: solid;
+}
+
+.milestone-done {
+  border-left-color: #06d6a0;
+}
+
+.milestone-in_progress {
+  border-left-color: #3a86ff;
+}
+
+.milestone-planned {
+  border-left-color: #8b8ba7;
+}
+
+.milestone-delayed {
+  border-left-color: #ef476f;
+}
+
+.milestone-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.milestone-status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.milestone-status.status-done {
+  background: rgba(6, 214, 160, 0.2);
+  color: #06d6a0;
+}
+
+.milestone-status.status-in_progress {
+  background: rgba(58, 134, 255, 0.2);
+  color: #3a86ff;
+}
+
+.milestone-status.status-planned {
+  background: rgba(139, 139, 167, 0.2);
+  color: #8b8ba7;
+}
+
+.milestone-status.status-delayed {
+  background: rgba(239, 71, 111, 0.2);
+  color: #ef476f;
+}
+
+.milestone-dates {
+  display: flex;
+  gap: 1.5rem;
+  margin: 1rem 0;
+  font-size: 0.85rem;
+  color: #8b8ba7;
+}
+
+.date-label {
+  color: #5a5a7a;
+  margin-right: 0.25rem;
+}
+
+.milestone-tasks {
+  margin: 1rem 0;
+}
+
+.tasks-label {
+  display: block;
+  font-size: 0.85rem;
+  color: #8b8ba7;
+  margin-bottom: 0.75rem;
+}
+
+.tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: #b8b8d1;
+}
+
+.task-completed {
+  color: #06d6a0;
+}
+
+.task-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.task-completed .task-checkbox {
+  background: rgba(6, 214, 160, 0.2);
+  color: #06d6a0;
+}
+
+.task-item:not(.task-completed) .task-checkbox {
+  border: 1px solid #8b8ba7;
+  color: #8b8ba7;
+}
+
+.milestone-progress {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(123, 44, 191, 0.2);
+}
+
+.progress-bar {
+  flex: 1;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6B46C1 0%, #553C9A 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #9F7AEA;
+  min-width: 50px;
+  text-align: right;
+}
+
+/* Legend */
+.legend {
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #b8b8d1;
+  font-size: 0.95rem;
+}
+
+.legend-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+
+.legend-dot.status-done {
+  background: #06d6a0;
+}
+
+.legend-dot.status-in_progress {
+  background: #3a86ff;
+}
+
+.legend-dot.status-planned {
+  background: #8b8ba7;
+}
+
+.legend-dot.status-delayed {
+  background: #ef476f;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .roadmap-hero {
+    padding: 6rem 1.5rem 3rem;
+  }
+
+  .roadmap-title {
+    font-size: 2.5rem;
+  }
+
+  .milestones-list {
+    grid-template-columns: 1fr;
+  }
+
+  .milestone-dates {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .legend {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+}
