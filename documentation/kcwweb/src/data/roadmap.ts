@@ -81,6 +81,9 @@ export const roadmapData: RoadmapData = {
             { id: 'task-004', title: 'Создать GDD — документ дизайна игры', completed: true },
             { id: 'task-005', title: 'Определить стек технологий (Unity, C#, Flow Fields, Mirror)', completed: true },
             { id: 'task-006', title: 'Создать MVP-прототип для проверки концепции', completed: false },
+            { id: 'task-007', title: 'Проработать Ки\'Архе и Тал\'Син (идеология, механика идентичности)', completed: true },
+            { id: 'task-008', title: 'Проработать 4 молодые расы (Ре\'Зиры, Ти\'Оны, Ве\'Ори, Родверы)', completed: true },
+            { id: 'task-009', title: 'Создать веб-портал документации (kcwweb)', completed: true },
           ],
         },
         {

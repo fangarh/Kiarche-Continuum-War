@@ -92,6 +92,42 @@ export const conceptArts: ConceptArt[] = [
     category: 'characters',
     tags: ['talsin', 'crystal', 'form', 'resonators'],
   },
+
+  // --------------------------------------------------------------------------
+  // Молодые расы (Young Races) — Играбельные фракции
+  // --------------------------------------------------------------------------
+  {
+    id: 'rezir-001',
+    title: 'Ре\'Зиры: Последователи Вел\'Кетов',
+    description: 'Гуманоид с нанитовым симбионтом. Тёмная кожа с металлическим оттенком, светящиеся линии нанитовых потоков, глаза с вертикальными зрачками.',
+    imageUrl: '/assets/concepts/characters/villain.png',
+    category: 'characters',
+    tags: ['rezir', 'nanites', 'velketh', 'minion'],
+  },
+  {
+    id: 'tion-001',
+    title: 'Ти\'Оны: Последователи Кешари',
+    description: 'Стройный гуманоид с серебристой кожей и светящимися глазами. Мозговой имплант виден как светящийся узор на висках.',
+    imageUrl: '/assets/concepts/characters/ally.png',
+    category: 'characters',
+    tags: ['tion', 'keshari', 'telepath', 'clone'],
+  },
+  {
+    id: 'veori-001',
+    title: 'Ве\'Ори: Последователи Этернов',
+    description: 'Гуманоид со светлой кожей и динамическими рисунками. Спокойное выражение лица, глаза меняют цвет при созерцании.',
+    imageUrl: '/assets/concepts/characters/hero.png',
+    category: 'characters',
+    tags: ['veori', 'eterns', 'meditation', 'peaceful'],
+  },
+  {
+    id: 'rodver-001',
+    title: 'Родверы: Самостоятельный путь',
+    description: 'Практически неотличимы от людей Земли. Плотное телосложение, адаптированные глаза, минимальные генетические изменения.',
+    imageUrl: '/assets/concepts/b369d202-detail.jpg',
+    category: 'characters',
+    tags: ['rodver', 'human', 'adaptive', 'mvp'],
+  },
 ];
 
 // ============================================================================

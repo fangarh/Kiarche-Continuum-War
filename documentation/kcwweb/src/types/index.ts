@@ -145,10 +145,29 @@ export interface UXPrinciple {
   examples: string[];
 }
 
+// ----------------------------------------------------------------------------
+// Механики молодых рас
+// ----------------------------------------------------------------------------
+export interface YoungRaceMechanic {
+  id: string;
+  name: string;
+  description: string;
+  mechanics: string[];
+  techTree: string;
+  victoryCondition: string;
+}
+
+export interface YoungRacesSystem {
+  title: string;
+  description: string;
+  races: YoungRaceMechanic[];
+}
+
 export interface MechanicsData {
   coreLoop: GameplayLoop;
   combat: CombatSystem;
   progression: ProgressionSystem;
+  youngRaces: YoungRacesSystem;
   economy: EconomySystem;
   uxPrinciples: UXPrinciple[];
 }
