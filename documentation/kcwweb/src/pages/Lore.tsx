@@ -8,8 +8,8 @@ import './Lore.css';
 
 type LoreTab = 'worlds' | 'history' | 'factions' | 'characters' | 'details';
 
-// Играбельные фракции (ID фракций)
-const PLAYABLE_FACTION_IDS = ['faction-talsin', 'faction-humans'];
+// Играбельные фракции — определяются по полю playable в данных
+// PLAYABLE_FACTION_IDS больше не используется, см. faction.playable
 
 const tabLabels: Record<LoreTab, string> = {
   worlds: 'Миры',
@@ -41,13 +41,20 @@ export function LorePage() {
 
   // Список фракций для таба "Детали"
   const factionList = [
+    // Древние фракции
     { id: 'kiarche', name: "Ки'Архе", colors: ['#6B46C1', '#553C9A', '#44337A'] },
-    { id: 'talsin', name: "Тал'Син", colors: ['#805AD5', '#6B46C1', '#553C9A'] },
     { id: 'syntex', name: 'Синтекс', colors: ['#4A90D9', '#2C5282', '#1A365D'] },
     { id: 'eterns', name: 'Этерны', colors: ['#E2E8F0', '#CBD5E0', '#A0AEC0'] },
+    // Современные фракции
+    { id: 'talsin', name: "Тал'Син", colors: ['#805AD5', '#6B46C1', '#553C9A'] },
     { id: 'keshari', name: 'Кешари', colors: ['#38A169', '#2F855A', '#276749'] },
     { id: 'sylni', name: "Сил'Ни", colors: ['#48BB78', '#38A169', '#2F855A'] },
     { id: 'velketh', name: "Вел'Кеты", colors: ['#C53030', '#9B2C2C', '#82227A'] },
+    // Молодые расы
+    { id: 'rodver', name: 'Родверы', colors: ['#3182CE', '#2B6CB0', '#1A365D'] },
+    { id: 'rezir', name: "Ре'Зиры", colors: ['#C53030', '#9B2C2C', '#742A2A'] },
+    { id: 'tion', name: "Ти'Оны", colors: ['#38A169', '#2F855A', '#276749'] },
+    { id: 'veori', name: "Ве'Ори", colors: ['#E2E8F0', '#CBD5E0', '#A0AEC0'] },
   ];
 
   const renderFactionContent = (factionId: string) => {
@@ -150,6 +157,95 @@ export function LorePage() {
             </div>
           </div>
         );
+
+      // =========================================================================
+      // МОЛОДЫЕ РАСЫ
+      // =========================================================================
+
+      case 'rodver':
+        return (
+          <div className="details-content">
+            <div className="details-markdown">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{extendedLore.rodver.overview}</ReactMarkdown>
+            </div>
+            <div className="details-markdown">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{extendedLore.rodver.biology}</ReactMarkdown>
+            </div>
+            <div className="details-markdown">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{extendedLore.rodver.culture}</ReactMarkdown>
+            </div>
+            <div className="details-markdown">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{extendedLore.rodver.mechanics}</ReactMarkdown>
+            </div>
+            <div className="details-markdown">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{extendedLore.rodver.gameplay}</ReactMarkdown>
+            </div>
+          </div>
+        );
+
+      case 'rezir':
+        return (
+          <div className="details-content">
+            <div className="details-markdown">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{extendedLore.rezir.overview}</ReactMarkdown>
+            </div>
+            <div className="details-markdown">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{extendedLore.rezir.biology}</ReactMarkdown>
+            </div>
+            <div className="details-markdown">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{extendedLore.rezir.culture}</ReactMarkdown>
+            </div>
+            <div className="details-markdown">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{extendedLore.rezir.mechanics}</ReactMarkdown>
+            </div>
+            <div className="details-markdown">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{extendedLore.rezir.gameplay}</ReactMarkdown>
+            </div>
+          </div>
+        );
+
+      case 'tion':
+        return (
+          <div className="details-content">
+            <div className="details-markdown">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{extendedLore.tion.overview}</ReactMarkdown>
+            </div>
+            <div className="details-markdown">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{extendedLore.tion.biology}</ReactMarkdown>
+            </div>
+            <div className="details-markdown">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{extendedLore.tion.culture}</ReactMarkdown>
+            </div>
+            <div className="details-markdown">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{extendedLore.tion.mechanics}</ReactMarkdown>
+            </div>
+            <div className="details-markdown">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{extendedLore.tion.gameplay}</ReactMarkdown>
+            </div>
+          </div>
+        );
+
+      case 'veori':
+        return (
+          <div className="details-content">
+            <div className="details-markdown">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{extendedLore.veori.overview}</ReactMarkdown>
+            </div>
+            <div className="details-markdown">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{extendedLore.veori.biology}</ReactMarkdown>
+            </div>
+            <div className="details-markdown">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{extendedLore.veori.culture}</ReactMarkdown>
+            </div>
+            <div className="details-markdown">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{extendedLore.veori.mechanics}</ReactMarkdown>
+            </div>
+            <div className="details-markdown">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{extendedLore.veori.gameplay}</ReactMarkdown>
+            </div>
+          </div>
+        );
+
       default:
         return null;
     }
@@ -192,8 +288,8 @@ export function LorePage() {
         );
 
       case 'factions': {
-        const playableFactions = loreData.factions.filter(f => PLAYABLE_FACTION_IDS.includes(f.id));
-        const nonPlayableFactions = loreData.factions.filter(f => !PLAYABLE_FACTION_IDS.includes(f.id));
+        const playableFactions = loreData.factions.filter(f => f.playable);
+        const nonPlayableFactions = loreData.factions.filter(f => !f.playable);
 
         const renderFactionCard = (faction: Faction, isPlayable: boolean) => (
           <Card key={faction.id} className={`faction-card ${isPlayable ? 'faction-card-playable' : ''}`}>

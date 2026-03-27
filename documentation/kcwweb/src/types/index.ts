@@ -58,6 +58,7 @@ export interface Faction {
   name: string;
   description: string;
   alignment: 'good' | 'neutral' | 'evil' | 'unknown';
+  playable: boolean; // true = играбельная фракция, false = NPC/антагонист
   symbol?: string;
   colors: string[];
 }
