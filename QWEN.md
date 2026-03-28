@@ -257,3 +257,6 @@ Apache License 2.0 — см. `LICENSE`
 7. **Unity проект**: Использует Unity 6 (6000.4.0f1) с URP. Основные пакеты указаны в `Packages/manifest.json`.
 
 8. **Структура кампании**: Две кампании на выбор — молодые расы (классическая 4X) и Тал'Син (уникальная механика идентичности).
+
+## Qwen Added Memories
+- Kiarche Continuum War — Unity 6000 LTS, Input Manager (Old), MVP прототип: выделение (клик+drag), перемещение (ПКМ), атака, HUD ресурсов. Скрипты: Unit.cs, UnitController.cs, RTSInput.cs, GameManager.cs, ResourceManager.cs, GameUI.cs. MVP не готов — только базовое управление работает.
