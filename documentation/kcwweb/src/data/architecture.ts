@@ -100,9 +100,27 @@ export const architectureData: ArchitectureData = {
     // ========================================================================
     {
       name: 'Units',
-      description: 'Базовые классы юнитов, характеристики, здоровье, перемещение.',
+      description: 'Базовые классы юнитов, характеристики, здоровье, перемещение. **Реализовано в MVP прототипе (базовое).**',
       path: 'src/Units',
       dependencies: ['Core', 'ObjectPool'],
+    },
+    {
+      name: 'Units.Movement',
+      description: 'Движение юнитов: перемещение к точке, формации (круг, линия). **Реализовано в MVP (базовое).**',
+      path: 'src/Units/Movement',
+      dependencies: ['Units'],
+    },
+    {
+      name: 'Units.Combat',
+      description: 'Бой юнитов: атака, урон, здоровье, перезарядка. **Реализовано в MVP (базовое).**',
+      path: 'src/Units/Combat',
+      dependencies: ['Units'],
+    },
+    {
+      name: 'Units.Selection',
+      description: 'Выделение юнитов: клик, drag selection, групповое выделение. **Реализовано в MVP.**',
+      path: 'src/Units/Selection',
+      dependencies: ['Units', 'Input'],
     },
     {
       name: 'Units.Heroes',
@@ -274,17 +292,33 @@ export const architectureData: ArchitectureData = {
     },
 
     // ========================================================================
+    // INPUT — Ввод
+    // ========================================================================
+    {
+      name: 'Input',
+      description: 'Система ввода: мышь, клавиатура, Input System. **Реализовано в MVP.**',
+      path: 'src/InputSystem',
+      dependencies: ['Core'],
+    },
+    {
+      name: 'Input.RTS',
+      description: 'RTS управление: выделение, перемещение, атака. **Реализовано в MVP.**',
+      path: 'src/InputSystem/RTS',
+      dependencies: ['Input', 'Units'],
+    },
+
+    // ========================================================================
     // UI — Пользовательский интерфейс
     // ========================================================================
     {
       name: 'UI',
-      description: 'UI система: Canvas, панели, HUD, меню.',
+      description: 'UI система: Canvas, панели, HUD, меню. **Реализовано в MVP.**',
       path: 'src/UI',
       dependencies: ['Core', 'Events'],
     },
     {
       name: 'UI.HUD',
-      description: 'HUD в игре: ресурсы, миникарта, информация о юнитах.',
+      description: 'HUD в игре: ресурсы, миникарта, информация о юнитах. **Реализовано в MVP (ресурсы, выделение).**',
       path: 'src/UI/HUD',
       dependencies: ['UI', 'Units', 'Economy'],
     },
