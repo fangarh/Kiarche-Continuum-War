@@ -40,7 +40,7 @@ namespace KiarcheContinuumWar.Units
         public void FindAllUnits()
         {
             _allUnits.Clear();
-            Unit[] units = FindObjectsByType<Unit>();
+            Unit[] units = FindObjectsByType<Unit>(FindObjectsInactive.Include);
             _allUnits.AddRange(units);
 
             // Подписаться на события смерти
@@ -108,12 +108,25 @@ namespace KiarcheContinuumWar.Units
 
                 Vector3 screenPoint = camera.WorldToScreenPoint(unit.transform.position);
 
-                // Проверка: юнит в пределах rect и перед камерой
-                if (screenPoint.z > 0 &&
-                    screenPoint.x >= rect.xMin &&
+                // Проверка: юнит перед камерой
+                if (screenPoint.z < 0) continue;
+
+                // Проверка: экранные координаты в пределах экрана
+                if (screenPoint.x < 0 || screenPoint.x > Screen.width ||
+                    screenPoint.y < 0 || screenPoint.y > Screen.height)
+                {
+                    continue;
+                }
+
+                // WorldToScreenPoint использует Y от низа (0..Screen.height)
+                // rect использует Y от верха (0..Screen.height), поэтому инвертируем
+                float invertedY = Screen.height - screenPoint.y;
+
+                // Проверка: юнит в пределах rect
+                if (screenPoint.x >= rect.xMin &&
                     screenPoint.x <= rect.xMax &&
-                    screenPoint.y >= rect.yMin &&
-                    screenPoint.y <= rect.yMax)
+                    invertedY >= rect.yMin &&
+                    invertedY <= rect.yMax)
                 {
                     AddToSelection(unit);
                 }

@@ -15,7 +15,7 @@ namespace KiarcheContinuumWar.InputSystem
         public UnitController unitController;
 
         [Header("Selection Settings")]
-        [SerializeField] private float minDragDistance = 5f;
+        [SerializeField] private float minDragDistance = 10f;
         [SerializeField] private Color dragColor = new Color(0, 1, 0, 0.3f);
 
         // Состояние ввода
@@ -37,21 +37,23 @@ namespace KiarcheContinuumWar.InputSystem
             {
                 unitController = FindAnyObjectByType<UnitController>();
             }
+            
+            Debug.Log("[RTSInput] Инициализирован");
         }
 
         private void Update()
         {
-            _currentMousePosition = Input.mousePosition;
-
             // Левая кнопка мыши - выделение
             if (Input.GetMouseButtonDown(0))
             {
                 _startMousePosition = Input.mousePosition;
+                _currentMousePosition = Input.mousePosition;
                 _isDragging = false;
             }
 
             if (Input.GetMouseButton(0))
             {
+                _currentMousePosition = Input.mousePosition;
                 float dragDistance = Vector2.Distance(Input.mousePosition, _startMousePosition);
                 if (dragDistance > minDragDistance)
                 {
@@ -63,10 +65,12 @@ namespace KiarcheContinuumWar.InputSystem
             {
                 if (_isDragging)
                 {
+                    // Выделение рамкой
                     EndDragSelection();
                 }
                 else
                 {
+                    // Клик - выделение одного юнита или снятие выделения
                     HandleClick();
                 }
 
@@ -83,23 +87,37 @@ namespace KiarcheContinuumWar.InputSystem
         private void HandleClick()
         {
             Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-            
-            if (Physics.Raycast(ray, out RaycastHit hit, 100f))
+
+            if (Physics.Raycast(ray, out RaycastHit hit, 1000f))
             {
+                // Ищем юнита: проверяем hit.collider.gameObject и его родителей
                 Unit unit = hit.collider.GetComponent<Unit>();
+
                 if (unit == null)
                 {
                     unit = hit.collider.GetComponentInParent<Unit>();
                 }
-                
+
+                // Если всё ещё null, проверяем children (вдруг попали в родителя)
+                if (unit == null)
+                {
+                    unit = hit.collider.GetComponentInChildren<Unit>();
+                }
+
                 if (unit != null && unit.IsAlive)
                 {
+                    // Клик по юниту — выделить только его (заменить выделение)
                     unitController.SelectUnit(unit);
                 }
                 else
                 {
+                    // Клик по земле — снять выделение
                     unitController.DeselectAll();
                 }
+            }
+            else
+            {
+                unitController.DeselectAll();
             }
         }
 
@@ -126,13 +144,20 @@ namespace KiarcheContinuumWar.InputSystem
 
         private void EndDragSelection()
         {
-            // Input.mousePosition и WorldToScreenPoint используют одинаковые координаты (Y от низа)
-            float x = Mathf.Min(_startMousePosition.x, _currentMousePosition.x);
-            float y = Mathf.Min(_startMousePosition.y, _currentMousePosition.y);
-            float width = Mathf.Abs(_currentMousePosition.x - _startMousePosition.x);
-            float height = Mathf.Abs(_currentMousePosition.y - _startMousePosition.y);
+            // Преобразуем координаты для SelectUnitsInRect (GUI использует Y от верха)
+            float startX = _startMousePosition.x;
+            float startY = Screen.height - _startMousePosition.y;
+            float endX = _currentMousePosition.x;
+            float endY = Screen.height - _currentMousePosition.y;
+
+            float x = Mathf.Min(startX, endX);
+            float y = Mathf.Min(startY, endY);
+            float width = Mathf.Abs(endX - startX);
+            float height = Mathf.Abs(endY - startY);
 
             _selectionRect = new Rect(x, y, width, height);
+            
+            Debug.Log($"[RTSInput] Selection rect: {_selectionRect}");
             unitController.SelectUnitsInRect(_selectionRect, mainCamera);
         }
 

@@ -2,6 +2,7 @@ using UnityEngine;
 using KiarcheContinuumWar.Units;
 using KiarcheContinuumWar.Core;
 using KiarcheContinuumWar.InputSystem;
+using KiarcheContinuumWar.Pooling;
 
 namespace KiarcheContinuumWar.Managers
 {
@@ -14,6 +15,7 @@ namespace KiarcheContinuumWar.Managers
         [Header("Systems")]
         public ResourceManager resourceManager;
         public UnitController unitController;
+        public UnitPoolManager unitPoolManager;
 
         [Header("Test Settings")]
         public bool enableTestMode = true;
@@ -32,6 +34,9 @@ namespace KiarcheContinuumWar.Managers
 
             if (unitController == null)
                 unitController = FindAnyObjectByType<UnitController>();
+            
+            if (unitPoolManager == null)
+                unitPoolManager = FindAnyObjectByType<UnitPoolManager>();
         }
 
         private void Start()
@@ -51,11 +56,22 @@ namespace KiarcheContinuumWar.Managers
         {
             UnityEngine.Debug.Log("[GameManager] Настройка тестовой сцены");
 
+            // Проверить/создать менеджеры
+            if (unitPoolManager == null)
+            {
+                unitPoolManager = FindAnyObjectByType<UnitPoolManager>();
+                if (unitPoolManager == null)
+                {
+                    GameObject poolObj = new GameObject("UnitPoolManager");
+                    unitPoolManager = poolObj.AddComponent<UnitPoolManager>();
+                }
+            }
+
             if (unitPrefab == null)
             {
                 UnityEngine.Debug.LogWarning("[GameManager] Unit prefab не назначен! Создаю программно...");
                 CreateUnitPrefab();
-                return;
+                // Не return! Продолжаем спавн юнитов
             }
 
             // Создать тестовые юниты
@@ -68,30 +84,46 @@ namespace KiarcheContinuumWar.Managers
         /// </summary>
         private void CreateUnitPrefab()
         {
+            Debug.Log("[GameManager] Создаю UnitPrefab...");
+            
             // Создать GameObject
             unitPrefab = new GameObject("UnitPrefab");
-            
+
             // Добавить Unit компонент
             Unit unit = unitPrefab.AddComponent<Unit>();
-            
-            // Добавить Collider
+            Debug.Log($"[GameManager] Добавлен Unit компонент: {unit != null}");
+
+            // Добавить Collider (увеличенный для удобства выделения)
             CapsuleCollider collider = unitPrefab.AddComponent<CapsuleCollider>();
-            collider.radius = 0.5f;
+            collider.radius = 0.8f;  // Увеличенный радиус для выделения
             collider.height = 2f;
             collider.center = new Vector3(0, 1, 0);
-            
-            // Добавить Rigidbody
+
+            // Добавить Rigidbody (для RTS юнитов используем кинематический)
             Rigidbody rb = unitPrefab.AddComponent<Rigidbody>();
-            rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
-            
+            rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ | RigidbodyConstraints.FreezePositionY;
+            rb.isKinematic = true; // RTS юниты не подвержены гравитации
+
+            // Добавить UnitPathfinder (обязательно для движения!)
+            var pathfinder = unitPrefab.AddComponent<UnitPathfinder>();
+            Debug.Log($"[GameManager] Добавлен UnitPathfinder: {pathfinder != null}");
+
             // Визуализация
             GameObject visual = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             visual.transform.SetParent(unitPrefab.transform);
             visual.transform.localPosition = new Vector3(0, 1, 0);
             visual.name = "Visual";
             Destroy(visual.GetComponent<Collider>());
-            
-            UnityEngine.Debug.Log("[GameManager] Unit prefab создан программно");
+
+            // Установить цвет по умолчанию
+            Renderer renderer = visual.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                renderer.material.color = Color.white;
+            }
+
+            unitPrefab.SetActive(true); // Активировать префаб перед спавном
+            Debug.Log("[GameManager] Unit prefab создан");
         }
 
         /// <summary>
@@ -99,28 +131,67 @@ namespace KiarcheContinuumWar.Managers
         /// </summary>
         private void SpawnTestUnits(Vector3 position, int count, Color color)
         {
+            Debug.Log($"[GameManager] Спавн {count} юнитов в {position}");
+            
+            // Получить высоту terrain для спавна
+            float terrainHeight = GetTerrainHeight(position);
+            Debug.Log($"[GameManager] Высота terrain: {terrainHeight}");
+            
+            int spawnedCount = 0;
+            
             for (int i = 0; i < count; i++)
             {
                 float angle = (i / (float)count) * Mathf.PI * 2;
                 float radius = 3f;
                 Vector3 spawnPos = position + new Vector3(
                     Mathf.Cos(angle) * radius,
-                    0,
+                    terrainHeight + 1f,  // Спавн НАД поверхностью terrain (+1 чтобы не проваливались)
                     Mathf.Sin(angle) * radius
                 );
 
-                GameObject unitObj = Instantiate(unitPrefab, spawnPos, Quaternion.identity);
-                
-                // Настроить цвет (для визуального различия)
-                Renderer renderer = unitObj.GetComponentInChildren<Renderer>();
-                if (renderer != null)
+                // Использовать Instantiate вместо пула (для надёжности)
+                if (unitPrefab != null)
                 {
-                    renderer.material.color = color;
+                    GameObject unitObj = Instantiate(unitPrefab, spawnPos, Quaternion.identity);
+                    unitObj.SetActive(true);
+
+                    // Настроить цвет (для визуального различия)
+                    Renderer renderer = unitObj.GetComponentInChildren<Renderer>();
+                    if (renderer != null)
+                    {
+                        renderer.material.color = color;
+                    }
+                    spawnedCount++;
                 }
             }
 
+            Debug.Log($"[GameManager] Успешно заспавнено {spawnedCount} из {count} юнитов ({color})");
+
             // Обновить список юнитов
-            unitController?.FindAllUnits();
+            if (unitController != null)
+            {
+                unitController.FindAllUnits();
+                Debug.Log($"[GameManager] Юнитов на сцене: {unitController.SelectedUnits.Count}");
+            }
+        }
+
+        /// <summary>
+        /// Получить высоту terrain в точке.
+        /// </summary>
+        private float GetTerrainHeight(Vector3 position)
+        {
+            Terrain terrain = FindAnyObjectByType<Terrain>();
+            if (terrain == null) return 0;
+
+            TerrainData terrainData = terrain.terrainData;
+            Vector3 terrainPos = terrain.transform.position;
+
+            float normalizedX = (position.x - terrainPos.x) / terrainData.size.x;
+            float normalizedZ = (position.z - terrainPos.z) / terrainData.size.z;
+            normalizedX = Mathf.Clamp01(normalizedX);
+            normalizedZ = Mathf.Clamp01(normalizedZ);
+
+            return terrainPos.y + terrainData.GetInterpolatedHeight(normalizedX, normalizedZ);
         }
 
         private void Update()
@@ -160,21 +231,33 @@ namespace KiarcheContinuumWar.Managers
         private void RunPerformanceTest()
         {
             UnityEngine.Debug.Log("[GameManager] Запуск теста производительности...");
-            
+
             int targetCount = 400;
-            int currentCount = FindObjectsByType<Unit>().Length;
+            int currentCount = FindObjectsByType<Unit>(FindObjectsInactive.Include).Length;
             int toSpawn = targetCount - currentCount;
 
             if (toSpawn > 0)
             {
                 UnityEngine.Debug.Log($"[GameManager] Создание {toSpawn} юнитов для теста...");
                 SpawnTestUnits(Vector3.zero, toSpawn, Color.yellow);
-                UnityEngine.Debug.Log($"[GameManager] Всего юнитов: {FindObjectsByType<Unit>().Length}");
+                
+                // Запустить таймер для замера FPS
+                Invoke(nameof(ReportPerformance), 2f);
             }
             else
             {
                 UnityEngine.Debug.Log($"[GameManager] Уже есть {currentCount} юнитов (цель: {targetCount})");
             }
+        }
+
+        /// <summary>
+        /// Отчёт о производительности.
+        /// </summary>
+        private void ReportPerformance()
+        {
+            int fps = Mathf.RoundToInt(1.0f / Time.deltaTime);
+            int unitCount = FindObjectsByType<Unit>(FindObjectsInactive.Include).Length;
+            UnityEngine.Debug.Log($"[Performance] Юнитов: {unitCount}, FPS: {fps}");
         }
     }
 }

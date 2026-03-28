@@ -35,17 +35,35 @@ MVP прототип Kiarche Continuum War — минимальная верси
 
 ```
 Assets/Scripts/
+├── CameraSystem/
+│   └── RTSCamera.cs              # RTS камера (WSAD, зум)
 ├── Core/
-│   └── ResourceManager.cs      # Управление ресурсами
+│   └── ResourceManager.cs        # Управление ресурсами
+├── Editor/
+│   ├── CreateUnitPrefabEditor.cs # Tools → KCW → Create Unit Prefab
+│   ├── GenerateMVPScene.cs       # Tools → KCW → Generate MVP Scene
+│   └── GenerateTestMap.cs        # Tools → KCW → Generate Test Map
 ├── InputSystem/
-│   └── RTSInput.cs             # Обработка ввода (ЛКМ, ПКМ)
+│   └── RTSInput.cs               # Обработка ввода (ЛКМ, ПКМ)
 ├── Managers/
-│   └── GameManager.cs          # Главный менеджер, тестовая сцена
+│   ├── GameManager.cs            # Главный менеджер, тестовая сцена
+│   ├── UnitPoolManager.cs        # Менеджер пула юнитов
+│   └── FlowFieldSetup.cs         # Настройка FlowFieldManager
+├── Map/
+│   ├── MapManager.cs             # Данные карты (размер, границы, спавны)
+│   └── Obstacle.cs               # Препятствие (регистрация в FlowField)
+├── Pathfinding/
+│   ├── FlowField.cs              # Поле потока (ячейки, направления)
+│   ├── FlowFieldManager.cs       # Генерация поля от цели (BFS)
+│   └── UnitPathfinder.cs         # Движение юнита по полю
+├── Pooling/
+│   ├── ObjectPool.cs             # Универсальный пул объектов
+│   └── UnitPoolManager.cs        # Менеджер пула юнитов
 ├── UI/
-│   └── GameUI.cs               # HUD: ресурсы, выделение
+│   └── GameUI.cs                 # HUD: ресурсы, выделение
 └── Units/
-    ├── Unit.cs                 # Базовый класс юнита
-    └── UnitController.cs       # Контроллер группы юнитов
+    ├── Unit.cs                   # Базовый класс юнита
+    └── UnitController.cs         # Контроллер группы юнитов
 ```
 
 ---
@@ -146,9 +164,36 @@ Assets/Scripts/
 
 ## Известные проблемы
 
-1. **Юниты проходят сквозь друг друга** — нет avoidance (требуется Flow Fields)
-2. **Нет пути к цели** — прямое движение (требуется NavMesh)
-3. **Одинаковые юниты** — нет визуального различия (требуется настройка материалов)
+1. ~~Юниты проходят сквозь друг друга~~ — решено: добавлен separation avoidance
+2. ~~Нет пути к цели~~ — решено: Flow Fields pathfinding
+3. ~~Object Pooling~~ — решено: система пулов юнитов
+4. ~~Одинаковые юниты~~ — решено: разные цвета для команд
+5. ~~RTS камера~~ — решено: WSAD + зум
+6. **Нет карты с препятствиями** — тестовая карта генерируется через Tools → KCW
+
+---
+
+## Flow Fields Pathfinding
+
+**Реализовано:**
+- `FlowField.cs` — сетка ячеек с направлениями и стоимостью
+- `FlowFieldManager.cs` — генерация поля через BFS от цели
+- `UnitPathfinder.cs` — движение юнита по полю + separation avoidance
+
+**Как работает:**
+1. При получении приказа (ПКМ) генерируется поле потока от целевой точки
+2. Каждая ячейка хранит направление к цели и стоимость (расстояние)
+3. Юниты двигаются по вектору поля + избегают столкновений (separation)
+
+**Настройка:**
+- Добавь `FlowFieldManager` на сцену (или создаётся автоматически)
+- Добавь `UnitPathfinder` на префаб юнита вместе с `Unit`
+- Настрой `fieldWidth`, `fieldHeight`, `cellSize` в FlowFieldManager
+
+**Отладка:**
+- Включи `drawDebugGizmos` в FlowFieldManager для визуализации
+- Жёлтые сферы — радиус separation юнита
+- Цветные точки — стоимость ячеек (зелёный = близко, красный = далеко)
 
 ---
 
@@ -156,8 +201,9 @@ Assets/Scripts/
 
 Согласно roadmap:
 
-- [ ] **task-008** — Flow Fields pathfinding
-- [ ] **task-009** — Object Pooling
-- [ ] **task-014** — Тест производительности (400 юнитов)
-- [ ] **task-015** — Tilemap карта
-- [ ] **task-016** — Пошаговый режим
+- [x] **task-008** — Flow Fields pathfinding ✅
+- [x] **task-009** — Object Pooling ✅
+- [x] **task-015** — Движок карты (Terrain, препятствия) ✅
+- [x] **task-019** — Базовая RTS камера (орбита, зум) ✅
+- [ ] **task-010** — Прототип боя (столкновение групп)
+- [ ] **task-020** — Тест производительности (400 юнитов)

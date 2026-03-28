@@ -259,4 +259,5 @@ Apache License 2.0 — см. `LICENSE`
 8. **Структура кампании**: Две кампании на выбор — молодые расы (классическая 4X) и Тал'Син (уникальная механика идентичности).
 
 ## Qwen Added Memories
-- Kiarche Continuum War — Unity 6000 LTS, Input Manager (Old), MVP прототип: выделение (клик+drag), перемещение (ПКМ), атака, HUD ресурсов. Скрипты: Unit.cs, UnitController.cs, RTSInput.cs, GameManager.cs, ResourceManager.cs, GameUI.cs. MVP не готов — только базовое управление работает.
+- Kiarche Continuum War — Unity 6000 LTS, Input Manager (Old), MVP прототип: выделение (клик+drag), перемещение (ПКМ), атака, HUD ресурсов. Скрипты: Unit.cs, UnitController.cs, RTSInput.cs, GameManager.cs, ResourceManager.cs, GameUI.cs.
+- **RTS MVP — базовое управление работает (2026-03-28)**: выделение юнитов (клик ЛКМ, рамка), приказы о перемещении и атаке (ПКМ), визуализация выделения (Gizmos), остановка юнитов при снятии выделения. Исправлены проблемы с drag selection и отменой приказов. См. `documentation/memory/rts_mvp_progress.md`.

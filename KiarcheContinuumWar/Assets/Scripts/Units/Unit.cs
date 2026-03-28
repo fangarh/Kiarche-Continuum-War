@@ -1,12 +1,13 @@
 using UnityEngine;
+using KiarcheContinuumWar.Pooling;
 
 namespace KiarcheContinuumWar.Units
 {
     /// <summary>
     /// Базовый класс юнита для RTS.
-    /// Обрабатывает движение, здоровье и базовые статы.
+    /// Обрабатывает здоровье, статы и делегирует движение UnitPathfinder.
     /// </summary>
-    public class Unit : MonoBehaviour
+    public class Unit : MonoBehaviour, IPoolableComponent
     {
         [Header("Unit Stats")]
         [SerializeField] private float moveSpeed = 5f;
@@ -31,9 +32,10 @@ namespace KiarcheContinuumWar.Units
         public bool IsAlive => health > 0;
         public float CurrentHealth => health;
 
+        // Компоненты
+        private UnitPathfinder _pathfinder;
+
         // Внутренние
-        private Vector3 _targetPosition;
-        private bool _isMoving = false;
         private float _lastAttackTime;
         private Unit _currentTarget;
 
@@ -41,19 +43,14 @@ namespace KiarcheContinuumWar.Units
         public System.Action<Unit> OnUnitDied;
         public System.Action<Unit, bool> OnSelectionChanged;
 
-        private void Start()
+        private void Awake()
         {
-            _targetPosition = transform.position;
+            _pathfinder = GetComponent<UnitPathfinder>();
         }
 
         private void Update()
         {
             if (!IsAlive) return;
-
-            if (_isMoving)
-            {
-                Move();
-            }
 
             if (_currentTarget != null && _currentTarget.IsAlive)
             {
@@ -66,8 +63,10 @@ namespace KiarcheContinuumWar.Units
         /// </summary>
         public void SetTargetPosition(Vector3 position)
         {
-            _targetPosition = position;
-            _isMoving = true;
+            if (_pathfinder != null)
+            {
+                _pathfinder.SetTargetPosition(position);
+            }
         }
 
         /// <summary>
@@ -76,6 +75,11 @@ namespace KiarcheContinuumWar.Units
         public void SetTarget(Unit target)
         {
             _currentTarget = target;
+            
+            if (_pathfinder != null)
+            {
+                _pathfinder.SetTarget(target);
+            }
         }
 
         /// <summary>
@@ -93,6 +97,14 @@ namespace KiarcheContinuumWar.Units
         public void Deselect()
         {
             IsSelected = false;
+            
+            // Остановить юнита при снятии выделения
+            var pathfinder = GetComponent<UnitPathfinder>();
+            if (pathfinder != null)
+            {
+                pathfinder.Stop();
+            }
+            
             OnSelectionChanged?.Invoke(this, false);
         }
 
@@ -106,20 +118,6 @@ namespace KiarcheContinuumWar.Units
             {
                 Die();
             }
-        }
-
-        private void Move()
-        {
-            float distance = Vector3.Distance(transform.position, _targetPosition);
-            if (distance < 0.1f)
-            {
-                _isMoving = false;
-                return;
-            }
-
-            Vector3 direction = (_targetPosition - transform.position).normalized;
-            transform.position += direction * moveSpeed * Time.deltaTime;
-            transform.rotation = Quaternion.LookRotation(direction);
         }
 
         private void TryAttack()
@@ -145,19 +143,50 @@ namespace KiarcheContinuumWar.Units
         private void Die()
         {
             OnUnitDied?.Invoke(this);
-            gameObject.SetActive(false);
+            
+            // Возврат в пул вместо уничтожения
+            var poolManager = FindAnyObjectByType<Managers.UnitPoolManager>();
+            if (poolManager != null)
+            {
+                poolManager.DespawnUnit(this);
+            }
+            else
+            {
+                gameObject.SetActive(false);
+            }
         }
 
         private void OnDrawGizmosSelected()
         {
+            // Отрисовка только когда объект выбран в инспекторе
             Gizmos.color = Color.green;
             Gizmos.DrawWireSphere(transform.position, 0.5f);
+        }
 
-            if (_isMoving)
+        private void OnDrawGizmos()
+        {
+            // Отрисовка выделения в рантайме
+            if (IsSelected)
             {
-                Gizmos.color = Color.blue;
-                Gizmos.DrawLine(transform.position, _targetPosition);
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawWireSphere(transform.position, 0.6f);
             }
+        }
+
+        // IPoolableComponent implementation
+        public void OnObjectActivate()
+        {
+            // Сброс состояния при активации из пула
+            health = 100f; // TODO: вынести в настройки
+            _currentTarget = null;
+            Deselect();
+        }
+
+        public void OnObjectReturn()
+        {
+            // Очистка состояния перед возвратом в пул
+            Deselect();
+            _currentTarget = null;
         }
     }
 }
