@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using KiarcheContinuumWar.Map;
 
 namespace KiarcheContinuumWar.Pathfinding
 {
@@ -13,7 +14,12 @@ namespace KiarcheContinuumWar.Pathfinding
         [SerializeField] private int fieldWidth = 100;
         [SerializeField] private int fieldHeight = 100;
         [SerializeField] private float cellSize = 1f;
-        
+
+        [Header("Obstacle Detection")]
+        [SerializeField] private LayerMask obstacleLayerMask = -1;
+        [SerializeField] private bool autoScanObstacles = true;
+        [SerializeField] private float obstacleScanRadius = 50f;
+
         [Header("Debug")]
         [SerializeField] private bool drawDebugGizmos = false;
 
@@ -22,6 +28,7 @@ namespace KiarcheContinuumWar.Pathfinding
 
         // Список препятствий для динамического обновления
         private List<Vector3> _obstaclePositions = new List<Vector3>();
+        private HashSet<Vector2Int> _obstacleGridPositions = new HashSet<Vector2Int>();
 
         // Singleton для доступа из любого места
         private static FlowFieldManager _instance;
@@ -50,8 +57,14 @@ namespace KiarcheContinuumWar.Pathfinding
                 return;
             }
             _instance = this;
-            
+
             InitializeField();
+            
+            // Автоматическое сканирование препятствий при старте
+            if (autoScanObstacles)
+            {
+                ScanObstacles();
+            }
         }
 
         /// <summary>
@@ -65,8 +78,67 @@ namespace KiarcheContinuumWar.Pathfinding
                 0,
                 -fieldHeight * cellSize / 2
             );
-            
+
             _currentField = new FlowField(fieldWidth, fieldHeight, cellSize, _fieldOrigin);
+        }
+
+        /// <summary>
+        /// Автоматическое сканирование препятствий на сцене.
+        /// </summary>
+        public void ScanObstacles()
+        {
+            _obstaclePositions.Clear();
+            _obstacleGridPositions.Clear();
+
+            // Находим все препятствия через Physics.OverlapSphere
+            Collider[] colliders = Physics.OverlapSphere(Vector3.zero, obstacleScanRadius, obstacleLayerMask);
+
+            foreach (Collider collider in colliders)
+            {
+                Obstacle obstacle = collider.GetComponent<Obstacle>();
+                if (obstacle != null)
+                {
+                    // Добавляем позицию препятствия
+                    Vector3 pos = collider.transform.position;
+                    if (!_obstaclePositions.Contains(pos))
+                    {
+                        _obstaclePositions.Add(pos);
+
+                        // Добавляем все ячейки, которые занимает препятствие
+                        Vector2Int gridPos = _currentField?.WorldToGrid(pos) ?? Vector2Int.zero;
+                        if (!_obstacleGridPositions.Contains(gridPos))
+                        {
+                            _obstacleGridPositions.Add(gridPos);
+                        }
+                    }
+                }
+            }
+
+            Debug.Log($"[FlowFieldManager] Найдено препятствий: {_obstaclePositions.Count}");
+        }
+
+        /// <summary>
+        /// Добавить динамическое препятствие (например, юнит).
+        /// </summary>
+        public void AddDynamicObstacle(Vector3 worldPosition, float radius = 0.5f)
+        {
+            if (_currentField == null) return;
+
+            Vector2Int gridPos = _currentField.WorldToGrid(worldPosition);
+            
+            // Добавляем центральную ячейку и соседние (в зависимости от радиуса)
+            int cellsRadius = Mathf.CeilToInt(radius / cellSize);
+            for (int x = -cellsRadius; x <= cellsRadius; x++)
+            {
+                for (int y = -cellsRadius; y <= cellsRadius; y++)
+                {
+                    Vector2Int pos = gridPos + new Vector2Int(x, y);
+                    if (pos.x >= 0 && pos.x < fieldWidth && pos.y >= 0 && pos.y < fieldHeight)
+                    {
+                        _currentField.SetObstacle(pos);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -82,11 +154,10 @@ namespace KiarcheContinuumWar.Pathfinding
             }
 
             _currentField.Clear();
-            
-            // Перерегистрировать все препятствия
-            foreach (Vector3 obstaclePos in _obstaclePositions)
+
+            // Перерегистрировать все статические препятствия
+            foreach (Vector2Int gridPos in _obstacleGridPositions)
             {
-                Vector2Int gridPos = _currentField.WorldToGrid(obstaclePos);
                 _currentField.SetObstacle(gridPos);
             }
 
@@ -100,9 +171,21 @@ namespace KiarcheContinuumWar.Pathfinding
                 return;
             }
 
+            // Проверка: цель не в препятствии
+            if (!_currentField.GetCell(targetGrid).IsWalkable)
+            {
+                Debug.LogWarning($"Target position {targetPosition} is inside an obstacle. Finding nearest walkable cell...");
+                targetGrid = FindNearestWalkableCell(targetGrid);
+                if (targetGrid.x == -1)
+                {
+                    Debug.LogError("No walkable path to target!");
+                    return;
+                }
+            }
+
             // BFS для генерации поля потока
             Queue<Vector2Int> queue = new Queue<Vector2Int>();
-            
+
             // Устанавливаем цель (стоимость = 0)
             _currentField.SetCell(targetGrid, Vector2Int.zero, 0, true);
             queue.Enqueue(targetGrid);
@@ -116,11 +199,13 @@ namespace KiarcheContinuumWar.Pathfinding
                 new Vector2Int(-1, 1), new Vector2Int(-1, -1)
             };
 
+            int processedCells = 0;
             while (queue.Count > 0)
             {
                 Vector2Int current = queue.Dequeue();
                 FlowField.Cell currentCell = _currentField.GetCell(current);
                 int currentCost = currentCell.Cost;
+                processedCells++;
 
                 // Обрабатываем всех соседей
                 foreach (Vector2Int dir in directions)
@@ -155,6 +240,53 @@ namespace KiarcheContinuumWar.Pathfinding
                     }
                 }
             }
+
+            Debug.Log($"[FlowFieldManager] Flow field generated: {processedCells} cells, target at {targetGrid}");
+        }
+
+        /// <summary>
+        /// Найти ближайшую проходимую ячейку.
+        /// </summary>
+        private Vector2Int FindNearestWalkableCell(Vector2Int startGrid)
+        {
+            Queue<Vector2Int> queue = new Queue<Vector2Int>();
+            HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
+            
+            queue.Enqueue(startGrid);
+            visited.Add(startGrid);
+
+            Vector2Int[] directions = new Vector2Int[4]
+            {
+                new Vector2Int(1, 0), new Vector2Int(-1, 0),
+                new Vector2Int(0, 1), new Vector2Int(0, -1)
+            };
+
+            while (queue.Count > 0)
+            {
+                Vector2Int current = queue.Dequeue();
+                
+                FlowField.Cell cell = _currentField.GetCell(current);
+                if (cell.IsWalkable)
+                {
+                    return current;
+                }
+
+                foreach (Vector2Int dir in directions)
+                {
+                    Vector2Int neighbor = current + dir;
+                    
+                    if (neighbor.x >= 0 && neighbor.x < fieldWidth &&
+                        neighbor.y >= 0 && neighbor.y < fieldHeight &&
+                        !visited.Contains(neighbor))
+                    {
+                        visited.Add(neighbor);
+                        queue.Enqueue(neighbor);
+                    }
+                }
+            }
+
+            // Не найдено проходимой ячейки
+            return new Vector2Int(-1, -1);
         }
 
         /// <summary>

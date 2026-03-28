@@ -205,18 +205,26 @@ namespace KiarcheContinuumWar.Units
         }
 
         /// <summary>
-        /// Распределить юнитов в формации.
+        /// Распределить юнитов в формации с улучшенным размещением.
         /// </summary>
         private void IssueFormationMove(Vector3 targetPosition)
         {
             int count = _selectedUnits.Count;
             if (count == 0) return;
 
-            // Простая формация: линия или круг
+            // Улучшенная формация: несколько кругов для больших групп
             for (int i = 0; i < count; i++)
             {
                 Vector3 offset = GetFormationOffset(i, count);
-                Vector3 finalPosition = targetPosition + offset;
+                
+                // Добавляем случайное небольшое смещение для предотвращения наложения
+                Vector3 randomOffset = new Vector3(
+                    Random.Range(-0.2f, 0.2f),
+                    0,
+                    Random.Range(-0.2f, 0.2f)
+                );
+                
+                Vector3 finalPosition = targetPosition + offset + randomOffset;
                 _selectedUnits[i].SetTargetPosition(finalPosition);
             }
         }
@@ -228,10 +236,26 @@ namespace KiarcheContinuumWar.Units
         {
             if (totalCount == 1) return Vector3.zero;
 
-            // Расположить по кругу
-            float angle = (index / (float)totalCount) * Mathf.PI * 2;
-            float radius = formationSpacing * Mathf.Sqrt(totalCount);
+            // Улучшенная формация: спираль/несколько кругов
+            float angle, radius;
             
+            if (totalCount <= 6)
+            {
+                // Для маленьких групп - один круг
+                angle = (index / (float)totalCount) * Mathf.PI * 2;
+                radius = formationSpacing * Mathf.Sqrt(totalCount) * 0.8f;
+            }
+            else
+            {
+                // Для больших групп - несколько кругов
+                int ring = Mathf.FloorToInt(Mathf.Sqrt(index));
+                int indexInRing = index - ring * ring;
+                int countInRing = ring == 0 ? 1 : ring * 6;
+                
+                angle = (indexInRing / (float)countInRing) * Mathf.PI * 2;
+                radius = formationSpacing * (ring + 1);
+            }
+
             return new Vector3(
                 Mathf.Cos(angle) * radius,
                 0,

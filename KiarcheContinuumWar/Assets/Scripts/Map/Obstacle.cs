@@ -12,16 +12,18 @@ namespace KiarcheContinuumWar.Map
         [Header("Obstacle Settings")]
         [SerializeField] private float obstacleRadius = 2f;
         [SerializeField] private bool registerOnStart = true;
-        
+        [SerializeField] private bool updateOnMove = true;
+
         [Header("Debug")]
         [SerializeField] private bool drawDebugGizmos = true;
 
         private FlowFieldManager _flowFieldManager;
         private bool _isRegistered = false;
+        private Vector3 _lastPosition;
 
         public float ObstacleRadius => obstacleRadius;
         public bool IsRegistered => _isRegistered;
-        
+
         // Public setter для редактора
         public void SetObstacleRadius(float radius)
         {
@@ -31,11 +33,30 @@ namespace KiarcheContinuumWar.Map
         private void Start()
         {
             _flowFieldManager = FlowFieldManager.Instance;
+            _lastPosition = transform.position;
 
             if (registerOnStart)
             {
                 RegisterObstacle();
             }
+        }
+
+        private void Update()
+        {
+            // Обновление препятствия при перемещении
+            if (updateOnMove && _isRegistered)
+            {
+                if (Vector3.Distance(_lastPosition, transform.position) > 0.1f)
+                {
+                    UpdateObstacle();
+                    _lastPosition = transform.position;
+                }
+            }
+        }
+
+        private void OnDestroy()
+        {
+            // TODO: Добавить удаление препятствия из FlowFieldManager
         }
 
         /// <summary>

@@ -124,7 +124,7 @@ namespace KiarcheContinuumWar.InputSystem
         private void HandleRightClick()
         {
             Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-            
+
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
                 Unit unit = hit.collider.GetComponent<Unit>();
@@ -137,7 +137,14 @@ namespace KiarcheContinuumWar.InputSystem
                 }
                 else
                 {
-                    unitController.IssueMoveOrder(hit.point);
+                    // Используем точку на поверхности terrain
+                    Vector3 targetPosition = hit.point;
+
+                    // Отладка: показываем точку назначения
+                    Debug.Log($"[RTSInput] Move order to: {targetPosition} (mouse: {Input.mousePosition})");
+                    Debug.DrawLine(ray.origin, targetPosition, Color.green, 2f);
+
+                    unitController.IssueMoveOrder(targetPosition);
                 }
             }
         }
