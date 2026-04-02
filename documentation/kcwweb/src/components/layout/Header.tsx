@@ -15,17 +15,20 @@ export function Header() {
       <div className="header-container">
         <Link to="/" className="logo" onClick={closeMenu}>
           <span className="logo-icon">◈</span>
-          <span className="logo-text">Kiarche Continuum War</span>
+          <div className="logo-text-wrapper">
+            <span className="logo-text-main">Kiarche</span>
+            <span className="logo-text-sub">Continuum War</span>
+          </div>
         </Link>
 
-        <nav className={`nav ${isMenuOpen ? 'nav-open' : ''}`}>
+        {/* Desktop Navigation */}
+        <nav className="nav desktop-nav">
           <ul className="nav-list">
             {navigation.map((item) => (
               <li key={item.path} className="nav-item">
                 <Link
                   to={item.path}
                   className={`nav-link ${location.pathname === item.path ? 'nav-link-active' : ''}`}
-                  onClick={closeMenu}
                 >
                   {item.label}
                 </Link>
@@ -45,6 +48,23 @@ export function Header() {
           <span className="menu-toggle-line"></span>
         </button>
       </div>
+
+      {/* Mobile Navigation - Separate element for total control */}
+      <nav className={`mobile-nav ${isMenuOpen ? 'mobile-nav-open' : ''}`}>
+        <ul className="mobile-nav-list">
+          {navigation.map((item) => (
+            <li key={item.path} className="mobile-nav-item">
+              <Link
+                to={item.path}
+                className={`mobile-nav-link ${location.pathname === item.path ? 'nav-link-active' : ''}`}
+                onClick={closeMenu}
+              >
+                {item.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
     </header>
   );
 }
