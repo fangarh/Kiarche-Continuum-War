@@ -28,6 +28,9 @@ namespace KiarcheContinuumWar.UI
 
         private Font _defaultFont;
         private Vector2Int _lastScreenSize;
+        private GUIStyle _panelStyle;
+        private GUIStyle _titleStyle;
+        private GUIStyle _bodyStyle;
 
         private void Awake()
         {
@@ -57,6 +60,18 @@ namespace KiarcheContinuumWar.UI
         {
             EnsureCanvasLayout();
             UpdateUnitDisplay();
+        }
+
+        private void OnGUI()
+        {
+            if (!ShouldUseImmediateGuiFallback())
+            {
+                return;
+            }
+
+            EnsureGuiStyles();
+            DrawResourceFallback();
+            DrawUnitFallback();
         }
 
         private void UpdateResourceDisplay(ResourceType type = ResourceType.Materials, int amount = 0)
@@ -179,6 +194,18 @@ namespace KiarcheContinuumWar.UI
             Canvas canvas = GetComponentInParent<Canvas>();
             if (canvas != null)
             {
+                RectTransform canvasRect = canvas.GetComponent<RectTransform>();
+                if (canvasRect != null)
+                {
+                    canvasRect.anchorMin = Vector2.zero;
+                    canvasRect.anchorMax = Vector2.one;
+                    canvasRect.offsetMin = Vector2.zero;
+                    canvasRect.offsetMax = Vector2.zero;
+                    canvasRect.pivot = new Vector2(0.5f, 0.5f);
+                    canvasRect.localScale = Vector3.one;
+                    canvasRect.anchoredPosition = Vector2.zero;
+                }
+
                 CanvasScaler scaler = canvas.GetComponent<CanvasScaler>();
                 if (scaler != null)
                 {
@@ -188,6 +215,78 @@ namespace KiarcheContinuumWar.UI
                     scaler.matchWidthOrHeight = 0.5f;
                 }
             }
+        }
+
+        private bool ShouldUseImmediateGuiFallback()
+        {
+            RectTransform rootRect = GetComponent<RectTransform>();
+            if (rootRect == null)
+            {
+                return true;
+            }
+
+            float width = rootRect.rect.width;
+            float height = rootRect.rect.height;
+            return width < Screen.width * 0.8f || height < Screen.height * 0.8f;
+        }
+
+        private void EnsureGuiStyles()
+        {
+            if (_panelStyle != null)
+            {
+                return;
+            }
+
+            _panelStyle = new GUIStyle(GUI.skin.box);
+            _panelStyle.normal.background = Texture2D.whiteTexture;
+            _panelStyle.normal.textColor = Color.white;
+            _panelStyle.alignment = TextAnchor.UpperLeft;
+            _panelStyle.padding = new RectOffset(12, 12, 10, 10);
+
+            _titleStyle = new GUIStyle(GUI.skin.label);
+            _titleStyle.fontSize = 18;
+            _titleStyle.fontStyle = FontStyle.Bold;
+            _titleStyle.normal.textColor = Color.white;
+
+            _bodyStyle = new GUIStyle(GUI.skin.label);
+            _bodyStyle.fontSize = 16;
+            _bodyStyle.normal.textColor = Color.white;
+            _bodyStyle.richText = false;
+            _bodyStyle.wordWrap = true;
+        }
+
+        private void DrawResourceFallback()
+        {
+            Color previousColor = GUI.color;
+            GUI.color = new Color(0.05f, 0.08f, 0.12f, 0.9f);
+            GUI.Box(new Rect(16f, 16f, 340f, 126f), GUIContent.none, _panelStyle);
+            GUI.color = previousColor;
+
+            GUI.Label(new Rect(28f, 24f, 300f, 24f), "Ресурсы", _titleStyle);
+            GUI.Label(new Rect(28f, 50f, 300f, 22f), materialsText != null ? materialsText.text : "Материалы: 0", _bodyStyle);
+            GUI.Label(new Rect(28f, 72f, 300f, 22f), energyText != null ? energyText.text : "Энергия: 0", _bodyStyle);
+            GUI.Label(new Rect(28f, 94f, 300f, 22f), foodText != null ? foodText.text : "Еда: 0", _bodyStyle);
+            GUI.Label(new Rect(28f, 116f, 300f, 22f), knowledgeText != null ? knowledgeText.text : "Знания: 0", _bodyStyle);
+        }
+
+        private void DrawUnitFallback()
+        {
+            bool hasSelection = unitController != null && unitController.SelectedUnits.Count > 0;
+            if (!hasSelection)
+            {
+                return;
+            }
+
+            float panelHeight = 108f;
+            float panelY = Screen.height - panelHeight - 16f;
+
+            Color previousColor = GUI.color;
+            GUI.color = new Color(0.05f, 0.08f, 0.12f, 0.9f);
+            GUI.Box(new Rect(16f, panelY, 380f, panelHeight), GUIContent.none, _panelStyle);
+            GUI.color = previousColor;
+
+            GUI.Label(new Rect(28f, panelY + 10f, 340f, 24f), selectedUnitsText != null ? selectedUnitsText.text : "Выделение", _titleStyle);
+            GUI.Label(new Rect(28f, panelY + 38f, 340f, 56f), unitDetailsText != null ? unitDetailsText.text : string.Empty, _bodyStyle);
         }
 
         private void EnsureResourcesPanel()

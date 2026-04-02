@@ -540,16 +540,23 @@ namespace KiarcheContinuumWar.Editor
 
         private static void CreateHUD()
         {
-            GameObject canvasObj = new GameObject("Canvas");
-            Canvas canvas = canvasObj.AddComponent<Canvas>();
+            GameObject canvasObj = new GameObject("Canvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+            RectTransform canvasRect = canvasObj.GetComponent<RectTransform>();
+            canvasRect.anchorMin = Vector2.zero;
+            canvasRect.anchorMax = Vector2.one;
+            canvasRect.offsetMin = Vector2.zero;
+            canvasRect.offsetMax = Vector2.zero;
+            canvasRect.pivot = new Vector2(0.5f, 0.5f);
+
+            Canvas canvas = canvasObj.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.sortingOrder = 100;
 
-            CanvasScaler scaler = canvasObj.AddComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
-            scaler.scaleFactor = 1f;
-
-            canvasObj.AddComponent<GraphicRaycaster>();
+            CanvasScaler scaler = canvasObj.GetComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920f, 1080f);
+            scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+            scaler.matchWidthOrHeight = 0.5f;
 
             GameObject hudRoot = CreateStretchRoot(canvasObj.transform, "HUDRoot");
             GameUI gameUI = hudRoot.AddComponent<GameUI>();
