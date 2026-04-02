@@ -3,6 +3,7 @@ using KiarcheContinuumWar.Units;
 using KiarcheContinuumWar.Core;
 using KiarcheContinuumWar.InputSystem;
 using KiarcheContinuumWar.Pooling;
+using KiarcheContinuumWar.Map;
 
 namespace KiarcheContinuumWar.Managers
 {
@@ -22,6 +23,7 @@ namespace KiarcheContinuumWar.Managers
         public int testUnitCount = 20;
         public Vector3 spawnPosition1 = new Vector3(-10, 0, 0);
         public Vector3 spawnPosition2 = new Vector3(10, 0, 0);
+        public Vector3 spawnPosition3 = new Vector3(0, 0, 10);
 
         [Header("Unit Prefab")]
         public GameObject unitPrefab;
@@ -77,6 +79,7 @@ namespace KiarcheContinuumWar.Managers
             // Создать тестовые юниты
             SpawnTestUnits(spawnPosition1, testUnitCount, Color.blue);
             SpawnTestUnits(spawnPosition2, testUnitCount, Color.red);
+            SpawnTestUnits(spawnPosition3, testUnitCount, Color.green);
         }
 
         /// <summary>
@@ -132,22 +135,19 @@ namespace KiarcheContinuumWar.Managers
         private void SpawnTestUnits(Vector3 position, int count, Color color)
         {
             Debug.Log($"[GameManager] Спавн {count} юнитов в {position}");
-            
-            // Получить высоту terrain для спавна
-            float terrainHeight = GetTerrainHeight(position);
-            Debug.Log($"[GameManager] Высота terrain: {terrainHeight}");
-            
+
             int spawnedCount = 0;
-            
+
             for (int i = 0; i < count; i++)
             {
                 float angle = (i / (float)count) * Mathf.PI * 2;
                 float radius = 3f;
-                Vector3 spawnPos = position + new Vector3(
+                Vector3 desiredSpawnPos = position + new Vector3(
                     Mathf.Cos(angle) * radius,
-                    terrainHeight + 1f,  // Спавн НАД поверхностью terrain (+1 чтобы не проваливались)
+                    0f,
                     Mathf.Sin(angle) * radius
                 );
+                Vector3 spawnPos = FindSafeSpawnPosition(desiredSpawnPos, position, i);
 
                 // Использовать Instantiate вместо пула (для надёжности)
                 if (unitPrefab != null)
@@ -173,6 +173,71 @@ namespace KiarcheContinuumWar.Managers
                 unitController.FindAllUnits();
                 Debug.Log($"[GameManager] Юнитов на сцене: {unitController.SelectedUnits.Count}");
             }
+        }
+
+        private Vector3 FindSafeSpawnPosition(Vector3 desiredPosition, Vector3 fallbackCenter, int unitIndex)
+        {
+            const float spawnHeightOffset = 1f;
+            const float clearanceRadius = 1.25f;
+            const int attempts = 18;
+
+            for (int attempt = 0; attempt < attempts; attempt++)
+            {
+                float searchRadius = 1.5f + attempt * 0.8f;
+                float searchAngle = (unitIndex * 0.73f) + attempt * 0.9f;
+                Vector3 candidate = desiredPosition + new Vector3(
+                    Mathf.Cos(searchAngle) * searchRadius,
+                    0f,
+                    Mathf.Sin(searchAngle) * searchRadius);
+
+                candidate.y = GetTerrainHeight(candidate) + spawnHeightOffset;
+                if (!IsBlocked(candidate, clearanceRadius))
+                {
+                    return candidate;
+                }
+            }
+
+            Vector3 fallback = fallbackCenter;
+            fallback.y = GetTerrainHeight(fallback) + spawnHeightOffset;
+            return fallback;
+        }
+
+        private bool IsBlocked(Vector3 position, float clearanceRadius)
+        {
+            Obstacle[] obstacles = FindObjectsByType<Obstacle>(FindObjectsInactive.Exclude);
+            foreach (Obstacle obstacle in obstacles)
+            {
+                if (obstacle == null)
+                {
+                    continue;
+                }
+
+                Vector2 positionXZ = new Vector2(position.x, position.z);
+                Vector2 obstacleXZ = new Vector2(obstacle.transform.position.x, obstacle.transform.position.z);
+                float minDistance = obstacle.ObstacleRadius + clearanceRadius;
+                if (Vector2.Distance(positionXZ, obstacleXZ) < minDistance)
+                {
+                    return true;
+                }
+            }
+
+            Unit[] existingUnits = FindObjectsByType<Unit>(FindObjectsInactive.Exclude);
+            foreach (Unit unit in existingUnits)
+            {
+                if (unit == null)
+                {
+                    continue;
+                }
+
+                Vector2 positionXZ = new Vector2(position.x, position.z);
+                Vector2 unitXZ = new Vector2(unit.transform.position.x, unit.transform.position.z);
+                if (Vector2.Distance(positionXZ, unitXZ) < clearanceRadius * 1.5f)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>

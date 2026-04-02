@@ -96,8 +96,10 @@ namespace KiarcheContinuumWar.Map
 
             float normalizedX = (position.x - terrainPos.x) / terrainData.size.x;
             float normalizedZ = (position.z - terrainPos.z) / terrainData.size.z;
+            normalizedX = Mathf.Clamp01(normalizedX);
+            normalizedZ = Mathf.Clamp01(normalizedZ);
 
-            return terrainData.GetInterpolatedHeight(normalizedX, normalizedZ);
+            return terrainPos.y + terrainData.GetInterpolatedHeight(normalizedX, normalizedZ);
         }
 
         /// <summary>

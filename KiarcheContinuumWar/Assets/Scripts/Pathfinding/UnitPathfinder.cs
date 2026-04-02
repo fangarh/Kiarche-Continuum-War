@@ -6,7 +6,7 @@ namespace KiarcheContinuumWar.Units
 {
     /// <summary>
     /// Компонент pathfinding для юнита.
-    /// Использует Flow Field для движения к цели с улучшенным локальным избеганием.
+    /// Использует Flow Field для движения к цели с локальным избеганием.
     /// </summary>
     public class UnitPathfinder : MonoBehaviour
     {
@@ -15,6 +15,8 @@ namespace KiarcheContinuumWar.Units
         [SerializeField] private float stoppingDistance = 0.5f;
         [SerializeField] private float rotationSpeed = 10f;
         [SerializeField] private float arrivalDistance = 1.0f;
+        [SerializeField] private float finalApproachDistance = 2.5f;
+        [SerializeField] private float snapToTargetDistance = 0.35f;
         [SerializeField] private float minMoveDistance = 0.001f;
 
         [Header("Debug")]
@@ -32,24 +34,18 @@ namespace KiarcheContinuumWar.Units
         [SerializeField] private float obstacleRayLength = 3f;
         [SerializeField] private LayerMask obstacleLayerMask = -1;
 
-        // Ссылки
         private FlowFieldManager _flowFieldManager;
         private Unit _unit;
         private CharacterController _characterController;
 
-        // Состояние
         private Vector3 _targetPosition;
         private Unit _targetUnit;
-        private bool _isMoving = false;
-        private bool _hasTarget = false;
-        private float _lastPathUpdateTime;
-        private Vector3 _currentDirection;
-        private Vector3 _currentVelocity;
+        private bool _isMoving;
+        private bool _hasTarget;
         private float _stuckCheckTimer;
         private Vector3 _lastPosition;
         private int _stuckCount;
 
-        // События
         public System.Action OnDestinationReached;
 
         private void Awake()
@@ -60,14 +56,13 @@ namespace KiarcheContinuumWar.Units
                 moveSpeed = _unit.MoveSpeed;
             }
 
-            // Добавляем CharacterController для физической коллизии
             _characterController = GetComponent<CharacterController>();
             if (_characterController == null)
             {
                 _characterController = gameObject.AddComponent<CharacterController>();
                 _characterController.radius = 0.3f;
                 _characterController.height = 1f;
-                _characterController.center = new Vector3(0, 0.5f, 0);
+                _characterController.center = new Vector3(0f, 0.5f, 0f);
                 _characterController.detectCollisions = true;
             }
         }
@@ -83,33 +78,23 @@ namespace KiarcheContinuumWar.Units
 
         private void Update()
         {
-            if (_unit == null || !_unit.IsAlive) return;
+            if (_unit == null || !_unit.IsAlive)
+            {
+                return;
+            }
 
-            // Проверка достижения цели (с увеличенным радиусом для предотвращения дрожания)
             if (_isMoving && !_hasTarget)
             {
                 float distanceToTarget = Vector3.Distance(transform.position, _targetPosition);
-                
-                // Отладка
-                if (drawDebugGizmos && distanceToTarget < arrivalDistance * 2f)
-                {
-                    Debug.Log($"[UnitPathfinder] Distance to target: {distanceToTarget:F3} (arrival: {arrivalDistance})");
-                }
-                
                 if (distanceToTarget < arrivalDistance)
                 {
+                    SnapToDestinationIfClose(_targetPosition, distanceToTarget);
                     _isMoving = false;
                     OnDestinationReached?.Invoke();
-                    
-                    if (drawDebugGizmos)
-                    {
-                        Debug.Log($"[UnitPathfinder] Destination reached at {transform.position}");
-                    }
-                    return; // Выходим сразу, чтобы не проверять застревание
+                    return;
                 }
             }
 
-            // Проверка цели-юнита
             if (_hasTarget && _targetUnit != null)
             {
                 if (!_targetUnit.IsAlive)
@@ -121,33 +106,26 @@ namespace KiarcheContinuumWar.Units
                 else
                 {
                     float distanceToTarget = Vector3.Distance(transform.position, _targetUnit.transform.position);
-                    if (distanceToTarget <= _unit.AttackRange)
+                    if (distanceToTarget <= _unit.AttackRange + stoppingDistance)
                     {
                         _isMoving = false;
                     }
                 }
             }
 
-            // Проверка застревания (только если не близко к цели)
             if (_isMoving)
             {
                 CheckIfStuck();
-            }
-
-            // Движение
-            if (_isMoving)
-            {
                 Move();
             }
         }
 
-        /// <summary>
-        /// Проверка, застрял ли юнит.
-        /// </summary>
         private void CheckIfStuck()
         {
-            // Не проверяем застревание, если близко к цели (чтобы избежать ложных срабатываний)
-            float distanceToTarget = Vector3.Distance(transform.position, _targetPosition);
+            Vector3 desiredTarget = _hasTarget && _targetUnit != null
+                ? _targetUnit.transform.position
+                : _targetPosition;
+            float distanceToTarget = Vector3.Distance(transform.position, desiredTarget);
             if (distanceToTarget < arrivalDistance * 2f)
             {
                 _stuckCount = 0;
@@ -156,7 +134,10 @@ namespace KiarcheContinuumWar.Units
             }
 
             _stuckCheckTimer += Time.deltaTime;
-            if (_stuckCheckTimer < 0.5f) return;
+            if (_stuckCheckTimer < 0.5f)
+            {
+                return;
+            }
 
             _stuckCheckTimer = 0f;
 
@@ -164,8 +145,6 @@ namespace KiarcheContinuumWar.Units
             if (distanceMoved < 0.01f && _isMoving)
             {
                 _stuckCount++;
-
-                // Если застрял 3 раза подряд - пересчитать путь
                 if (_stuckCount >= 3)
                 {
                     _stuckCount = 0;
@@ -180,275 +159,301 @@ namespace KiarcheContinuumWar.Units
             _lastPosition = transform.position;
         }
 
-        /// <summary>
-        /// Пересчитать путь при застревании.
-        /// </summary>
         private void RecalculatePath()
         {
-            // Небольшое смещение цели для обхода препятствия
             Vector3 offset = new Vector3(
                 Random.Range(-1f, 1f),
-                0,
-                Random.Range(-1f, 1f)
-            ).normalized * 2f;
-            
-            Vector3 newTarget = _hasTarget && _targetUnit != null 
+                0f,
+                Random.Range(-1f, 1f)).normalized * 2f;
+
+            Vector3 newTarget = _hasTarget && _targetUnit != null
                 ? _targetUnit.transform.position + offset
                 : _targetPosition + offset;
-            
+
             _flowFieldManager?.GenerateFlowField(newTarget);
         }
 
-        /// <summary>
-        /// Установить целевую позицию для движения.
-        /// </summary>
         public void SetTargetPosition(Vector3 position)
         {
-            _targetPosition = position;
+            SetTargetPosition(position, true);
+        }
+
+        public void SetTargetPosition(Vector3 position, bool rebuildFlowField)
+        {
+            _targetPosition = ClampToTerrain(position);
             _targetUnit = null;
             _hasTarget = false;
             _isMoving = true;
-            
-            // Генерируем поле потока от цели
-            _flowFieldManager?.GenerateFlowField(position);
+            if (rebuildFlowField)
+            {
+                _flowFieldManager?.GenerateFlowField(_targetPosition);
+            }
         }
 
-        /// <summary>
-        /// Установить целевой юнит для атаки.
-        /// </summary>
         public void SetTarget(Unit target)
         {
-            if (target == null) return;
-            
+            if (target == null)
+            {
+                return;
+            }
+
             _targetUnit = target;
             _hasTarget = true;
             _isMoving = true;
-            
-            // Генерируем поле потока от цели
             _flowFieldManager?.GenerateFlowField(target.transform.position);
         }
 
-        /// <summary>
-        /// Остановить движение.
-        /// </summary>
         public void Stop()
         {
             _isMoving = false;
         }
 
-        /// <summary>
-        /// Движение по полю потока с плавной остановкой near destination.
-        /// </summary>
         private void Move()
         {
-            // Сохраняем текущую Y позицию (на terrain)
-            float currentY = transform.position.y;
+            Vector3 desiredTarget = _hasTarget && _targetUnit != null
+                ? _targetUnit.transform.position
+                : _targetPosition;
+            float distanceToTarget = Vector3.Distance(transform.position, desiredTarget);
 
-            // Получаем направление от Flow Field
-            Vector3 flowDirection = Vector3.zero;
-
-            if (_hasTarget && _targetUnit != null)
+            if (!_hasTarget && distanceToTarget <= snapToTargetDistance)
             {
-                // Если цель - юнит, обновляем поле от её позиции
-                flowDirection = _flowFieldManager?.GetDirection(_targetUnit.transform.position) ?? Vector3.zero;
+                SnapToDestinationIfClose(desiredTarget, distanceToTarget);
+                _isMoving = false;
+                OnDestinationReached?.Invoke();
+                return;
+            }
+
+            Vector3 flowDirection;
+            if (distanceToTarget <= finalApproachDistance)
+            {
+                flowDirection = desiredTarget - transform.position;
+                flowDirection.y = 0f;
             }
             else
             {
-                // Если цель - позиция, используем её
                 flowDirection = _flowFieldManager?.GetDirection(transform.position) ?? Vector3.zero;
+                if (flowDirection.sqrMagnitude < minMoveDistance * minMoveDistance)
+                {
+                    flowDirection = desiredTarget - transform.position;
+                    flowDirection.y = 0f;
+                }
             }
 
-            // Применяем separation (избегание других юнитов)
+            float avoidanceWeight = Mathf.Clamp01(
+                (distanceToTarget - finalApproachDistance * 0.5f) /
+                Mathf.Max(finalApproachDistance, 0.001f));
+
             Vector3 finalDirection = flowDirection;
             if (useSeparation)
             {
-                finalDirection += CalculateSeparation();
+                finalDirection += CalculateSeparation() * avoidanceWeight;
             }
 
-            // Применяем avoidance препятствий (веер raycast)
-            Vector3 obstacleAvoidance = CalculateObstacleAvoidance(finalDirection);
-            finalDirection += obstacleAvoidance;
+            finalDirection += CalculateObstacleAvoidance(finalDirection) * avoidanceWeight;
 
-            // Вычисляем расстояние до цели для плавной остановки
-            float distanceToTarget = Vector3.Distance(transform.position, _targetPosition);
             float speedMultiplier = 1f;
-            
-            // Плавное замедление при приближении к цели (только в радиусе arrivalDistance)
-            if (distanceToTarget < arrivalDistance)
+            if (distanceToTarget < finalApproachDistance)
             {
-                speedMultiplier = distanceToTarget / arrivalDistance;
+                speedMultiplier = Mathf.Lerp(
+                    0.45f,
+                    1f,
+                    Mathf.InverseLerp(arrivalDistance, finalApproachDistance, distanceToTarget));
             }
 
-            // Нормализуем и применяем движение
-            if (finalDirection.sqrMagnitude > 0.001f)
+            if (finalDirection.sqrMagnitude <= minMoveDistance * minMoveDistance)
             {
-                // Движение только по XZ плоскости с плавным замедлением
-                Vector3 movement = finalDirection.normalized * moveSpeed * speedMultiplier * Time.deltaTime;
-                movement.y = 0;
+                return;
+            }
 
-                // Используем CharacterController для движения с коллизиями
-                if (_characterController != null && _characterController.enabled)
-                {
-                    CharacterControllerMove(movement);
-                }
-                else
-                {
-                    transform.position += movement;
-                }
+            Vector3 movement = finalDirection.normalized * moveSpeed * speedMultiplier * Time.deltaTime;
+            movement.y = 0f;
 
-                // Сохраняем Y позицию (чтобы юнит не падал/летал)
-                transform.position = new Vector3(transform.position.x, currentY, transform.position.z);
+            if (_characterController != null && _characterController.enabled)
+            {
+                CharacterControllerMove(movement);
+            }
+            else
+            {
+                transform.position += movement;
+            }
 
-                // Поворот по направлению движения (только если двигаемся достаточно быстро)
-                if (movement.magnitude > 0.001f)
-                {
-                    Quaternion targetRotation = Quaternion.LookRotation(movement);
-                    transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-                }
+            transform.position = ClampToTerrain(transform.position);
+
+            if (movement.sqrMagnitude > minMoveDistance * minMoveDistance)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(movement);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
             }
         }
 
-        /// <summary>
-        /// Расчёт избегания препятствий с помощью веера raycast.
-        /// </summary>
         private Vector3 CalculateObstacleAvoidance(Vector3 currentDirection)
         {
+            if (currentDirection.sqrMagnitude < minMoveDistance * minMoveDistance)
+            {
+                return Vector3.zero;
+            }
+
             Vector3 avoidance = Vector3.zero;
             Vector3 rayOrigin = transform.position + Vector3.up * 0.5f;
+            currentDirection.y = 0f;
+            currentDirection.Normalize();
 
-            // Стреляем лучами вперёд веером
+            int rayDivisor = Mathf.Max(obstacleRayCount - 1, 1);
             for (int i = 0; i < obstacleRayCount; i++)
             {
-                // Вычисляем угол для каждого луча
-                float angle = -30f + (i / (float)(obstacleRayCount - 1)) * 60f;
-                Quaternion rotation = Quaternion.Euler(0, angle, 0);
-                Vector3 rayDirection = rotation * currentDirection;
+                float angle = -30f + (i / (float)rayDivisor) * 60f;
+                Quaternion rotation = Quaternion.Euler(0f, angle, 0f);
+                Vector3 rayDirection = (rotation * currentDirection).normalized;
 
-                if (rayDirection.magnitude < 0.01f)
+                if (!Physics.SphereCast(
+                        rayOrigin,
+                        obstacleAvoidanceRadius * 0.5f,
+                        rayDirection,
+                        out RaycastHit hit,
+                        obstacleRayLength,
+                        obstacleLayerMask))
                 {
-                    rayDirection = transform.forward;
+                    continue;
                 }
 
-                // Пускаем raycast
-                if (Physics.SphereCast(rayOrigin, obstacleAvoidanceRadius * 0.5f, rayDirection, out RaycastHit hit, obstacleRayLength, obstacleLayerMask))
+                Obstacle obstacle = hit.collider.GetComponent<Obstacle>() ?? hit.collider.GetComponentInParent<Obstacle>();
+                if (obstacle == null)
                 {
-                    // Проверяем на препятствие (через компонент Obstacle)
-                    Obstacle obstacle = hit.collider.GetComponent<Obstacle>();
-                    if (obstacle != null)
-                    {
-                        // Вычисляем направление обхода (перпендикулярно к препятствию)
-                        Vector3 toObstacle = hit.point - transform.position;
-                        toObstacle.y = 0;
-
-                        // Направление обхода - перпендикулярно к препятствию и направлению движения
-                        Vector3 perpendicular = Vector3.Cross(toObstacle.normalized, Vector3.up).normalized;
-
-                        // Выбираем направление обхода (вправо или влево)
-                        float rightDot = Vector3.Dot(perpendicular, currentDirection);
-                        if (rightDot < 0)
-                        {
-                            perpendicular = -perpendicular;
-                        }
-
-                        // Сила избегания зависит от расстояния
-                        float distanceStrength = 1f - (hit.distance / obstacleRayLength);
-                        avoidance += perpendicular * distanceStrength * obstacleAvoidanceStrength;
-
-                        Debug.DrawLine(transform.position, hit.point, Color.red, 0.1f);
-                    }
+                    continue;
                 }
+
+                Vector3 awayFromObstacle = rayOrigin - hit.point;
+                awayFromObstacle.y = 0f;
+                if (awayFromObstacle.sqrMagnitude < 0.001f)
+                {
+                    awayFromObstacle = -rayDirection;
+                }
+
+                awayFromObstacle.Normalize();
+                Vector3 tangent = Vector3.Cross(Vector3.up, awayFromObstacle).normalized;
+                if (Vector3.Dot(tangent, currentDirection) < 0f)
+                {
+                    tangent = -tangent;
+                }
+
+                float distanceStrength = 1f - (hit.distance / obstacleRayLength);
+                Vector3 steering = (awayFromObstacle * 0.55f) + (tangent * 0.85f);
+                avoidance += steering * distanceStrength * obstacleAvoidanceStrength;
+
+                Debug.DrawLine(transform.position, hit.point, Color.red, 0.1f);
             }
 
             return avoidance;
         }
 
-        /// <summary>
-        /// Движение через CharacterController с обработкой коллизий.
-        /// </summary>
         private void CharacterControllerMove(Vector3 movement)
         {
-            if (_characterController == null || !_characterController.enabled) return;
-
-            // Пытаемся двигаться
-            CollisionFlags flags = _characterController.Move(movement);
-            
-            // Если столкнулись - пытаемся обойти
-            if (flags != CollisionFlags.None)
+            if (_characterController == null || !_characterController.enabled)
             {
-                // Если столкнулись - пытаемся обойти
-                Vector3 slideDirection = movement;
-                slideDirection.y = 0;
+                return;
+            }
 
-                // Проверяем, есть ли пространство для обхода
-                if (Physics.SphereCast(transform.position + Vector3.up * 0.5f, 0.3f, slideDirection, out RaycastHit hit, 0.5f, obstacleLayerMask))
-                {
-                    // Пытаемся обойти справа
-                    Vector3 rightDir = Vector3.Cross(slideDirection, Vector3.up).normalized;
-                    if (!_characterController.Raycast(new Ray(transform.position, rightDir), out RaycastHit rightHit, 0.5f))
-                    {
-                        _characterController.Move(rightDir * movement.magnitude * 0.5f);
-                    }
-                    else if (!_characterController.Raycast(new Ray(transform.position, -rightDir), out RaycastHit leftHit, 0.5f))
-                    {
-                        _characterController.Move(-rightDir * movement.magnitude * 0.5f);
-                    }
-                }
+            CollisionFlags flags = _characterController.Move(movement);
+            if (flags == CollisionFlags.None)
+            {
+                return;
+            }
+
+            Vector3 slideDirection = movement;
+            slideDirection.y = 0f;
+            if (slideDirection.sqrMagnitude < minMoveDistance * minMoveDistance)
+            {
+                return;
+            }
+
+            slideDirection.Normalize();
+
+            if (!Physics.SphereCast(transform.position + Vector3.up * 0.5f, 0.3f, slideDirection, out _, 0.5f, obstacleLayerMask))
+            {
+                return;
+            }
+
+            Vector3 rightDir = Vector3.Cross(slideDirection, Vector3.up).normalized;
+            if (!_characterController.Raycast(new Ray(transform.position, rightDir), out _, 0.5f))
+            {
+                _characterController.Move(rightDir * movement.magnitude * 0.5f);
+            }
+            else if (!_characterController.Raycast(new Ray(transform.position, -rightDir), out _, 0.5f))
+            {
+                _characterController.Move(-rightDir * movement.magnitude * 0.5f);
             }
         }
 
-        /// <summary>
-        /// Расчёт силы разделения (avoidance других юнитов).
-        /// </summary>
+        private void SnapToDestinationIfClose(Vector3 destination, float distanceToTarget)
+        {
+            if (distanceToTarget > snapToTargetDistance || _hasTarget)
+            {
+                return;
+            }
+
+            transform.position = ClampToTerrain(destination);
+        }
+
+        private Vector3 ClampToTerrain(Vector3 position)
+        {
+            MapManager mapManager = MapManager.Instance;
+            if (mapManager == null)
+            {
+                return position;
+            }
+
+            Vector3 clamped = mapManager.ClampToBounds(position);
+            clamped.y = mapManager.GetTerrainHeight(clamped);
+            return clamped;
+        }
+
         private Vector3 CalculateSeparation()
         {
             Vector3 separation = Vector3.zero;
-
-            // Ищем ближайших юнитов
             Collider[] nearbyColliders = Physics.OverlapSphere(transform.position, separationDistance);
 
             foreach (Collider collider in nearbyColliders)
             {
-                if (collider.gameObject == gameObject) continue;
+                if (collider.gameObject == gameObject)
+                {
+                    continue;
+                }
 
                 UnitPathfinder otherUnit = collider.GetComponent<UnitPathfinder>();
-                if (otherUnit != null && otherUnit != this)
+                if (otherUnit == null || otherUnit == this)
                 {
-                    Vector3 away = transform.position - collider.transform.position;
-                    float distance = away.magnitude;
-
-                    if (distance > 0.01f)
-                    {
-                        // Чем ближе юнит, тем сильнее отталкивание (квадратичное затухание)
-                        float strength = (separationDistance - distance) / separationDistance;
-                        strength = strength * strength; // Усиливаем близкое отталкивание
-                        separation += away.normalized * strength * separationStrength;
-                    }
+                    continue;
                 }
+
+                Vector3 away = transform.position - collider.transform.position;
+                float distance = away.magnitude;
+                if (distance <= 0.01f)
+                {
+                    continue;
+                }
+
+                float strength = (separationDistance - distance) / separationDistance;
+                strength *= strength;
+                separation += away.normalized * strength * separationStrength;
             }
 
             return separation;
         }
 
-        /// <summary>
-        /// Отладочная визуализация.
-        /// </summary>
         private void OnDrawGizmosSelected()
         {
-            // Показываем цель
             Gizmos.color = Color.magenta;
             Gizmos.DrawWireSphere(_targetPosition, 0.3f);
 
-            // Показываем радиус остановки
             if (drawDebugGizmos)
             {
-                Gizmos.color = new Color(1, 0, 1, 0.3f);
+                Gizmos.color = new Color(1f, 0f, 1f, 0.3f);
                 Gizmos.DrawWireSphere(_targetPosition, arrivalDistance);
             }
 
             if (_isMoving)
             {
                 Gizmos.color = Color.yellow;
-
                 if (_hasTarget && _targetUnit != null)
                 {
                     Gizmos.DrawLine(transform.position, _targetUnit.transform.position);
@@ -459,10 +464,9 @@ namespace KiarcheContinuumWar.Units
                 }
             }
 
-            // Радиус separation
             if (useSeparation)
             {
-                Gizmos.color = new Color(1, 1, 0, 0.3f);
+                Gizmos.color = new Color(1f, 1f, 0f, 0.3f);
                 Gizmos.DrawWireSphere(transform.position, separationDistance);
             }
         }

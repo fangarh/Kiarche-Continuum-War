@@ -16,6 +16,7 @@ import type { RoadmapData } from '../types';
 // - ✅ RTS Камера — WSAD панорамирование, зум, ограничения карты
 // - ✅ Карта с препятствиями — Terrain 100x100, генерация через Editor
 // - ✅ RTS Управление — выделение (клик/рамка), приказы (ПКМ), визуализация
+// - ✅ HUD прототип — ресурсы и панель выделенных юнитов
 // - 🔄 Прототип боя — в работе
 //
 // =============================================================================
@@ -107,7 +108,7 @@ export const roadmapData: RoadmapData = {
             { id: 'task-012', title: 'Базовый юнит — движение, выбор, командование', completed: true },
             { id: 'task-013', title: 'Выделение юнитов — клик, drag selection', completed: true },
             { id: 'task-014', title: 'Перемещение и атака — ПКМ приказы', completed: true },
-            { id: 'task-015', title: 'HUD прототип — ресурсы, панель юнитов', completed: false },
+            { id: 'task-015', title: 'HUD прототип — ресурсы, панель юнитов', completed: true },
             { id: 'task-016', title: 'Flow Fields pathfinding — интеграция для 400+ юнитов', completed: true },
             { id: 'task-017', title: 'Object Pooling — система пулов юнитов', completed: true },
             { id: 'task-018', title: 'Прототип боя — столкновение двух групп юнитов', completed: false },

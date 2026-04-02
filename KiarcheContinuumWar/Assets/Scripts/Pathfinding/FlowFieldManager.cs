@@ -1,11 +1,10 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 using KiarcheContinuumWar.Map;
 
 namespace KiarcheContinuumWar.Pathfinding
 {
     /// <summary>
-    /// Менеджер полей потока.
     /// Генерирует и управляет FlowField для pathfinding юнитов.
     /// </summary>
     public class FlowFieldManager : MonoBehaviour
@@ -21,16 +20,13 @@ namespace KiarcheContinuumWar.Pathfinding
         [SerializeField] private float obstacleScanRadius = 50f;
 
         [Header("Debug")]
-        [SerializeField] private bool drawDebugGizmos = false;
+        [SerializeField] private bool drawDebugGizmos;
 
         private FlowField _currentField;
         private Vector3 _fieldOrigin;
+        private readonly List<Vector3> _obstaclePositions = new List<Vector3>();
+        private readonly HashSet<Vector2Int> _obstacleGridPositions = new HashSet<Vector2Int>();
 
-        // Список препятствий для динамического обновления
-        private List<Vector3> _obstaclePositions = new List<Vector3>();
-        private HashSet<Vector2Int> _obstacleGridPositions = new HashSet<Vector2Int>();
-
-        // Singleton для доступа из любого места
         private static FlowFieldManager _instance;
         public static FlowFieldManager Instance
         {
@@ -45,9 +41,12 @@ namespace KiarcheContinuumWar.Pathfinding
                         _instance = go.AddComponent<FlowFieldManager>();
                     }
                 }
+
                 return _instance;
             }
         }
+
+        public FlowField CurrentField => _currentField;
 
         private void Awake()
         {
@@ -56,96 +55,82 @@ namespace KiarcheContinuumWar.Pathfinding
                 Destroy(gameObject);
                 return;
             }
-            _instance = this;
 
+            _instance = this;
             InitializeField();
-            
-            // Автоматическое сканирование препятствий при старте
+
             if (autoScanObstacles)
             {
                 ScanObstacles();
             }
         }
 
-        /// <summary>
-        /// Инициализировать поле потока.
-        /// </summary>
         private void InitializeField()
         {
-            // Вычисляем_origin так, чтобы поле было центрировано на (0, 0, 0)
-            _fieldOrigin = new Vector3(
-                -fieldWidth * cellSize / 2,
-                0,
-                -fieldHeight * cellSize / 2
-            );
+            MapManager mapManager = MapManager.Instance;
+            if (mapManager != null)
+            {
+                fieldWidth = Mathf.Max(1, Mathf.CeilToInt(mapManager.MapWidth / cellSize));
+                fieldHeight = Mathf.Max(1, Mathf.CeilToInt(mapManager.MapHeight / cellSize));
+                _fieldOrigin = mapManager.MapOrigin;
+            }
+            else
+            {
+                _fieldOrigin = new Vector3(
+                    -fieldWidth * cellSize / 2f,
+                    0f,
+                    -fieldHeight * cellSize / 2f);
+            }
 
             _currentField = new FlowField(fieldWidth, fieldHeight, cellSize, _fieldOrigin);
         }
 
-        /// <summary>
-        /// Автоматическое сканирование препятствий на сцене.
-        /// </summary>
         public void ScanObstacles()
         {
             _obstaclePositions.Clear();
             _obstacleGridPositions.Clear();
 
-            // Находим все препятствия через Physics.OverlapSphere
-            Collider[] colliders = Physics.OverlapSphere(Vector3.zero, obstacleScanRadius, obstacleLayerMask);
+            MapManager mapManager = MapManager.Instance;
+            Vector3 scanCenter = Vector3.zero;
+            Vector3 scanHalfExtents = new Vector3(obstacleScanRadius, 512f, obstacleScanRadius);
 
+            if (mapManager != null)
+            {
+                scanCenter = new Vector3(
+                    mapManager.MapOrigin.x + mapManager.MapWidth * 0.5f,
+                    0f,
+                    mapManager.MapOrigin.z + mapManager.MapHeight * 0.5f);
+                scanHalfExtents = new Vector3(
+                    mapManager.MapWidth * 0.5f + cellSize,
+                    512f,
+                    mapManager.MapHeight * 0.5f + cellSize);
+            }
+
+            Collider[] colliders = Physics.OverlapBox(scanCenter, scanHalfExtents, Quaternion.identity, obstacleLayerMask);
             foreach (Collider collider in colliders)
             {
-                Obstacle obstacle = collider.GetComponent<Obstacle>();
-                if (obstacle != null)
+                Obstacle obstacle = collider.GetComponent<Obstacle>() ?? collider.GetComponentInParent<Obstacle>();
+                if (obstacle == null)
                 {
-                    // Добавляем позицию препятствия
-                    Vector3 pos = collider.transform.position;
-                    if (!_obstaclePositions.Contains(pos))
-                    {
-                        _obstaclePositions.Add(pos);
-
-                        // Добавляем все ячейки, которые занимает препятствие
-                        Vector2Int gridPos = _currentField?.WorldToGrid(pos) ?? Vector2Int.zero;
-                        if (!_obstacleGridPositions.Contains(gridPos))
-                        {
-                            _obstacleGridPositions.Add(gridPos);
-                        }
-                    }
+                    continue;
                 }
+
+                Vector3 obstaclePosition = collider.transform.position;
+                if (!_obstaclePositions.Contains(obstaclePosition))
+                {
+                    _obstaclePositions.Add(obstaclePosition);
+                }
+
+                RegisterObstacleArea(obstaclePosition, Mathf.Max(obstacle.ObstacleRadius, cellSize * 0.5f));
             }
 
-            Debug.Log($"[FlowFieldManager] Найдено препятствий: {_obstaclePositions.Count}");
         }
 
-        /// <summary>
-        /// Добавить динамическое препятствие (например, юнит).
-        /// </summary>
         public void AddDynamicObstacle(Vector3 worldPosition, float radius = 0.5f)
         {
-            if (_currentField == null) return;
-
-            Vector2Int gridPos = _currentField.WorldToGrid(worldPosition);
-            
-            // Добавляем центральную ячейку и соседние (в зависимости от радиуса)
-            int cellsRadius = Mathf.CeilToInt(radius / cellSize);
-            for (int x = -cellsRadius; x <= cellsRadius; x++)
-            {
-                for (int y = -cellsRadius; y <= cellsRadius; y++)
-                {
-                    Vector2Int pos = gridPos + new Vector2Int(x, y);
-                    if (pos.x >= 0 && pos.x < fieldWidth && pos.y >= 0 && pos.y < fieldHeight)
-                    {
-                        _currentField.SetObstacle(pos);
-                    }
-                }
-            }
+            RegisterObstacleArea(worldPosition, radius);
         }
 
-        /// <summary>
-        /// Сгенерировать поле потока от целевой точки.
-        /// Использует BFS для расчёта стоимости и направлений.
-        /// </summary>
-        /// <param name="targetPosition">Целевая позиция в мировых координатах</param>
         public void GenerateFlowField(Vector3 targetPosition)
         {
             if (_currentField == null)
@@ -153,25 +138,17 @@ namespace KiarcheContinuumWar.Pathfinding
                 InitializeField();
             }
 
+            targetPosition = ClampToMapBounds(targetPosition);
             _currentField.Clear();
-
-            // Перерегистрировать все статические препятствия
-            foreach (Vector2Int gridPos in _obstacleGridPositions)
-            {
-                _currentField.SetObstacle(gridPos);
-            }
+            ApplyRegisteredObstacles();
 
             Vector2Int targetGrid = _currentField.WorldToGrid(targetPosition);
-
-            // Проверка границ
-            if (targetGrid.x < 0 || targetGrid.x >= fieldWidth ||
-                targetGrid.y < 0 || targetGrid.y >= fieldHeight)
+            if (!IsInsideBounds(targetGrid))
             {
                 Debug.LogWarning($"Target position {targetPosition} is outside field bounds");
                 return;
             }
 
-            // Проверка: цель не в препятствии
             if (!_currentField.GetCell(targetGrid).IsWalkable)
             {
                 Debug.LogWarning($"Target position {targetPosition} is inside an obstacle. Finding nearest walkable cell...");
@@ -183,15 +160,11 @@ namespace KiarcheContinuumWar.Pathfinding
                 }
             }
 
-            // BFS для генерации поля потока
             Queue<Vector2Int> queue = new Queue<Vector2Int>();
-
-            // Устанавливаем цель (стоимость = 0)
             _currentField.SetCell(targetGrid, Vector2Int.zero, 0, true);
             queue.Enqueue(targetGrid);
 
-            // Направления для 8 соседей
-            Vector2Int[] directions = new Vector2Int[8]
+            Vector2Int[] directions =
             {
                 new Vector2Int(1, 0), new Vector2Int(-1, 0),
                 new Vector2Int(0, 1), new Vector2Int(0, -1),
@@ -203,95 +176,38 @@ namespace KiarcheContinuumWar.Pathfinding
             while (queue.Count > 0)
             {
                 Vector2Int current = queue.Dequeue();
-                FlowField.Cell currentCell = _currentField.GetCell(current);
-                int currentCost = currentCell.Cost;
+                int currentCost = _currentField.GetCell(current).Cost;
                 processedCells++;
 
-                // Обрабатываем всех соседей
-                foreach (Vector2Int dir in directions)
+                foreach (Vector2Int direction in directions)
                 {
-                    Vector2Int neighbor = current + dir;
+                    Vector2Int neighbor = current + direction;
+                    if (!IsInsideBounds(neighbor))
+                    {
+                        continue;
+                    }
 
-                    // Проверка границ
-                    if (neighbor.x < 0 || neighbor.x >= fieldWidth ||
-                        neighbor.y < 0 || neighbor.y >= fieldHeight)
+                    if (direction.x != 0 && direction.y != 0 && IsDiagonalBlocked(current, direction))
                     {
                         continue;
                     }
 
                     FlowField.Cell neighborCell = _currentField.GetCell(neighbor);
+                    int moveCost = direction.x != 0 && direction.y != 0 ? 14 : 10;
+                    int newCost = currentCost + moveCost;
 
-                    // Пропускаем если уже посещено или непроходимо
-                    if (!neighborCell.IsWalkable || neighborCell.Cost <= currentCost + 1)
+                    if (!neighborCell.IsWalkable || newCost >= neighborCell.Cost)
                     {
                         continue;
                     }
 
-                    // Вычисляем стоимость (диагональ = 1.4, прямая = 1)
-                    int moveCost = (dir.x != 0 && dir.y != 0) ? 14 : 10;
-                    int newCost = currentCost + moveCost;
-
-                    if (newCost < neighborCell.Cost)
-                    {
-                        // Устанавливаем направление ОТ соседа К текущей ячейке (к цели)
-                        Vector2Int flowDirection = current - neighbor;
-                        _currentField.SetCell(neighbor, flowDirection, newCost, true);
-                        queue.Enqueue(neighbor);
-                    }
+                    _currentField.SetCell(neighbor, current - neighbor, newCost, true);
+                    queue.Enqueue(neighbor);
                 }
             }
 
-            Debug.Log($"[FlowFieldManager] Flow field generated: {processedCells} cells, target at {targetGrid}");
         }
 
-        /// <summary>
-        /// Найти ближайшую проходимую ячейку.
-        /// </summary>
-        private Vector2Int FindNearestWalkableCell(Vector2Int startGrid)
-        {
-            Queue<Vector2Int> queue = new Queue<Vector2Int>();
-            HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
-            
-            queue.Enqueue(startGrid);
-            visited.Add(startGrid);
-
-            Vector2Int[] directions = new Vector2Int[4]
-            {
-                new Vector2Int(1, 0), new Vector2Int(-1, 0),
-                new Vector2Int(0, 1), new Vector2Int(0, -1)
-            };
-
-            while (queue.Count > 0)
-            {
-                Vector2Int current = queue.Dequeue();
-                
-                FlowField.Cell cell = _currentField.GetCell(current);
-                if (cell.IsWalkable)
-                {
-                    return current;
-                }
-
-                foreach (Vector2Int dir in directions)
-                {
-                    Vector2Int neighbor = current + dir;
-                    
-                    if (neighbor.x >= 0 && neighbor.x < fieldWidth &&
-                        neighbor.y >= 0 && neighbor.y < fieldHeight &&
-                        !visited.Contains(neighbor))
-                    {
-                        visited.Add(neighbor);
-                        queue.Enqueue(neighbor);
-                    }
-                }
-            }
-
-            // Не найдено проходимой ячейки
-            return new Vector2Int(-1, -1);
-        }
-
-        /// <summary>
-        /// Сгенерировать поле потока от нескольких целей.
-        /// </summary>
         public void GenerateFlowFieldFromMultipleTargets(List<Vector3> targetPositions)
         {
             if (_currentField == null)
@@ -300,24 +216,31 @@ namespace KiarcheContinuumWar.Pathfinding
             }
 
             _currentField.Clear();
+            ApplyRegisteredObstacles();
 
             Queue<Vector2Int> queue = new Queue<Vector2Int>();
-
-            // Добавляем все цели в очередь
-            foreach (Vector3 targetPos in targetPositions)
+            foreach (Vector3 targetPosition in targetPositions)
             {
-                Vector2Int targetGrid = _currentField.WorldToGrid(targetPos);
-                
-                if (targetGrid.x >= 0 && targetGrid.x < fieldWidth &&
-                    targetGrid.y >= 0 && targetGrid.y < fieldHeight)
+                Vector2Int targetGrid = _currentField.WorldToGrid(ClampToMapBounds(targetPosition));
+                if (!IsInsideBounds(targetGrid))
                 {
-                    _currentField.SetCell(targetGrid, Vector2Int.zero, 0, true);
-                    queue.Enqueue(targetGrid);
+                    continue;
                 }
+
+                if (!_currentField.GetCell(targetGrid).IsWalkable)
+                {
+                    targetGrid = FindNearestWalkableCell(targetGrid);
+                    if (targetGrid.x == -1)
+                    {
+                        continue;
+                    }
+                }
+
+                _currentField.SetCell(targetGrid, Vector2Int.zero, 0, true);
+                queue.Enqueue(targetGrid);
             }
 
-            // BFS от всех целей одновременно
-            Vector2Int[] directions = new Vector2Int[8]
+            Vector2Int[] directions =
             {
                 new Vector2Int(1, 0), new Vector2Int(-1, 0),
                 new Vector2Int(0, 1), new Vector2Int(0, -1),
@@ -328,142 +251,215 @@ namespace KiarcheContinuumWar.Pathfinding
             while (queue.Count > 0)
             {
                 Vector2Int current = queue.Dequeue();
-                FlowField.Cell currentCell = _currentField.GetCell(current);
-                int currentCost = currentCell.Cost;
+                int currentCost = _currentField.GetCell(current).Cost;
 
-                foreach (Vector2Int dir in directions)
+                foreach (Vector2Int direction in directions)
                 {
-                    Vector2Int neighbor = current + dir;
+                    Vector2Int neighbor = current + direction;
+                    if (!IsInsideBounds(neighbor))
+                    {
+                        continue;
+                    }
 
-                    if (neighbor.x < 0 || neighbor.x >= fieldWidth ||
-                        neighbor.y < 0 || neighbor.y >= fieldHeight)
+                    if (direction.x != 0 && direction.y != 0 && IsDiagonalBlocked(current, direction))
                     {
                         continue;
                     }
 
                     FlowField.Cell neighborCell = _currentField.GetCell(neighbor);
+                    int moveCost = direction.x != 0 && direction.y != 0 ? 14 : 10;
+                    int newCost = currentCost + moveCost;
 
-                    if (!neighborCell.IsWalkable || neighborCell.Cost <= currentCost + 1)
+                    if (!neighborCell.IsWalkable || newCost >= neighborCell.Cost)
                     {
                         continue;
                     }
 
-                    int moveCost = (dir.x != 0 && dir.y != 0) ? 14 : 10;
-                    int newCost = currentCost + moveCost;
-
-                    if (newCost < neighborCell.Cost)
-                    {
-                        Vector2Int flowDirection = current - neighbor;
-                        _currentField.SetCell(neighbor, flowDirection, newCost, true);
-                        queue.Enqueue(neighbor);
-                    }
+                    _currentField.SetCell(neighbor, current - neighbor, newCost, true);
+                    queue.Enqueue(neighbor);
                 }
             }
         }
 
-        /// <summary>
-        /// Установить препятствие в поле.
-        /// </summary>
         public void SetObstacle(Vector3 worldPosition)
         {
-            if (_currentField == null) return;
-
-            Vector2Int gridPos = _currentField.WorldToGrid(worldPosition);
-            _currentField.SetObstacle(gridPos);
-            
-            // Сохраняем позицию препятствия
-            if (!_obstaclePositions.Contains(worldPosition))
-            {
-                _obstaclePositions.Add(worldPosition);
-            }
+            RegisterObstacleArea(worldPosition, cellSize * 0.5f);
         }
 
-        /// <summary>
-        /// Установить круглое препятствие (радиус).
-        /// </summary>
+        public void SetObstacle(Vector3 worldPosition, float radius)
+        {
+            RegisterObstacleArea(worldPosition, radius);
+        }
+
         public void SetCircularObstacle(Vector3 center, float radius)
         {
-            if (_currentField == null) return;
-
-            int pointsCount = Mathf.CeilToInt(radius * 4); // Точки каждые ~0.25 единицы
-            
-            for (int i = 0; i < pointsCount; i++)
-            {
-                float angle = (i / (float)pointsCount) * Mathf.PI * 2;
-                Vector3 offset = new Vector3(
-                    Mathf.Cos(angle) * radius,
-                    0,
-                    Mathf.Sin(angle) * radius
-                );
-                
-                Vector3 worldPos = center + offset;
-                SetObstacle(worldPos);
-            }
+            RegisterObstacleArea(center, radius);
         }
 
-        /// <summary>
-        /// Очистить препятствие (сделать проходимым).
-        /// </summary>
         public void ClearObstacle(Vector3 worldPosition)
         {
-            if (_currentField == null) return;
+            if (_currentField == null)
+            {
+                return;
+            }
 
             Vector2Int gridPos = _currentField.WorldToGrid(worldPosition);
+            _obstacleGridPositions.Remove(gridPos);
             FlowField.Cell cell = _currentField.GetCell(gridPos);
             _currentField.SetCell(gridPos, cell.Direction, cell.Cost, true);
         }
 
-        /// <summary>
-        /// Получить направление движения для юнита.
-        /// </summary>
         public Vector3 GetDirection(Vector3 worldPosition)
         {
             if (_currentField == null)
             {
                 return Vector3.zero;
             }
+
             return _currentField.GetDirection(worldPosition);
         }
 
-        /// <summary>
-        /// Получить стоимость ячейки.
-        /// </summary>
         public int GetCost(Vector3 worldPosition)
         {
             if (_currentField == null)
             {
                 return int.MaxValue;
             }
-            FlowField.Cell cell = _currentField.GetCell(worldPosition);
-            return cell.Cost;
+
+            return _currentField.GetCell(worldPosition).Cost;
         }
 
-        /// <summary>
-        /// Проверить, достижима ли цель.
-        /// </summary>
         public bool IsReachable(Vector3 worldPosition)
         {
             if (_currentField == null)
             {
                 return false;
             }
+
             FlowField.Cell cell = _currentField.GetCell(worldPosition);
             return cell.IsWalkable && cell.Cost < int.MaxValue;
         }
 
-        /// <summary>
-        /// Отладочная визуализация.
-        /// </summary>
+        private Vector2Int FindNearestWalkableCell(Vector2Int startGrid)
+        {
+            Queue<Vector2Int> queue = new Queue<Vector2Int>();
+            HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
+
+            queue.Enqueue(startGrid);
+            visited.Add(startGrid);
+
+            Vector2Int[] directions =
+            {
+                new Vector2Int(1, 0), new Vector2Int(-1, 0),
+                new Vector2Int(0, 1), new Vector2Int(0, -1)
+            };
+
+            while (queue.Count > 0)
+            {
+                Vector2Int current = queue.Dequeue();
+                if (_currentField.GetCell(current).IsWalkable)
+                {
+                    return current;
+                }
+
+                foreach (Vector2Int direction in directions)
+                {
+                    Vector2Int neighbor = current + direction;
+                    if (!IsInsideBounds(neighbor) || visited.Contains(neighbor))
+                    {
+                        continue;
+                    }
+
+                    visited.Add(neighbor);
+                    queue.Enqueue(neighbor);
+                }
+            }
+
+            return new Vector2Int(-1, -1);
+        }
+
+        private void ApplyRegisteredObstacles()
+        {
+            foreach (Vector2Int gridPos in _obstacleGridPositions)
+            {
+                _currentField.SetObstacle(gridPos);
+            }
+        }
+
+        private void RegisterObstacleArea(Vector3 center, float radius)
+        {
+            if (_currentField == null)
+            {
+                InitializeField();
+            }
+
+            Vector2Int centerGrid = _currentField.WorldToGrid(center);
+            int gridRadius = Mathf.Max(1, Mathf.CeilToInt(radius / cellSize));
+            float radiusSqr = radius * radius;
+            float padding = cellSize * cellSize * 0.5f;
+
+            for (int x = -gridRadius; x <= gridRadius; x++)
+            {
+                for (int y = -gridRadius; y <= gridRadius; y++)
+                {
+                    Vector2Int gridPos = centerGrid + new Vector2Int(x, y);
+                    if (!IsInsideBounds(gridPos))
+                    {
+                        continue;
+                    }
+
+                    Vector3 worldPos = _currentField.GridToWorld(gridPos);
+                    Vector2 delta = new Vector2(worldPos.x - center.x, worldPos.z - center.z);
+                    if (delta.sqrMagnitude > radiusSqr + padding)
+                    {
+                        continue;
+                    }
+
+                    _currentField.SetObstacle(gridPos);
+                    _obstacleGridPositions.Add(gridPos);
+                }
+            }
+
+            if (!_obstaclePositions.Contains(center))
+            {
+                _obstaclePositions.Add(center);
+            }
+        }
+
+        private bool IsInsideBounds(Vector2Int gridPos)
+        {
+            return gridPos.x >= 0 && gridPos.x < fieldWidth && gridPos.y >= 0 && gridPos.y < fieldHeight;
+        }
+
+        private Vector3 ClampToMapBounds(Vector3 position)
+        {
+            MapManager mapManager = MapManager.Instance;
+            if (mapManager == null)
+            {
+                return position;
+            }
+
+            Vector3 clamped = mapManager.ClampToBounds(position);
+            clamped.y = mapManager.GetTerrainHeight(clamped);
+            return clamped;
+        }
+
+        private bool IsDiagonalBlocked(Vector2Int current, Vector2Int direction)
+        {
+            Vector2Int horizontal = new Vector2Int(current.x + direction.x, current.y);
+            Vector2Int vertical = new Vector2Int(current.x, current.y + direction.y);
+
+            return !_currentField.GetCell(horizontal).IsWalkable || !_currentField.GetCell(vertical).IsWalkable;
+        }
+
         private void OnDrawGizmos()
         {
             if (!drawDebugGizmos || _currentField == null)
             {
                 return;
             }
+
             _currentField.DebugDraw();
         }
-
-        // Публичный доступ к полю для отладки
-        public FlowField CurrentField => _currentField;
     }
 }

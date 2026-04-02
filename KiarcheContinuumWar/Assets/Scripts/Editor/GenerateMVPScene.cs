@@ -66,7 +66,7 @@ namespace KiarcheContinuumWar.Editor
             
             // 7. Создать RTSInput
             GameObject inputObj = new GameObject("RTSInput");
-            RTSInput rtsInput = inputObj.AddComponent<RTSInput>();
+            inputObj.AddComponent<RTSInput>();
             
             // 8. Создать Canvas для UI
             GameObject canvasObj = new GameObject("Canvas");
@@ -80,17 +80,15 @@ namespace KiarcheContinuumWar.Editor
             
             // Создать тексты ресурсов
             GameObject resourcesPanel = CreateResourcesPanel(canvasObj.transform);
-            GameObject selectedText = CreateSelectedUnitsText(canvasObj.transform);
-            
-            // Назначить ссылки в GameUI (через Find после создания)
-            EditorApplication.delayCall += () =>
-            {
-                gameUI.materialsText = GameObject.Find("MaterialsText")?.GetComponent<Text>();
-                gameUI.energyText = GameObject.Find("EnergyText")?.GetComponent<Text>();
-                gameUI.foodText = GameObject.Find("FoodText")?.GetComponent<Text>();
-                gameUI.knowledgeText = GameObject.Find("KnowledgeText")?.GetComponent<Text>();
-                gameUI.selectedUnitsText = GameObject.Find("SelectedUnitsText")?.GetComponent<Text>();
-            };
+            GameObject unitPanel = CreateUnitPanel(canvasObj.transform);
+
+            gameUI.materialsText = resourcesPanel.transform.Find("MaterialsText")?.GetComponent<Text>();
+            gameUI.energyText = resourcesPanel.transform.Find("EnergyText")?.GetComponent<Text>();
+            gameUI.foodText = resourcesPanel.transform.Find("FoodText")?.GetComponent<Text>();
+            gameUI.knowledgeText = resourcesPanel.transform.Find("KnowledgeText")?.GetComponent<Text>();
+            gameUI.selectedUnitsText = unitPanel.transform.Find("SelectedUnitsText")?.GetComponent<Text>();
+            gameUI.unitDetailsText = unitPanel.transform.Find("UnitDetailsText")?.GetComponent<Text>();
+            gameUI.unitPanel = unitPanel;
             
             // Назначить ссылки в GameManager
             gameManager.resourceManager = resourceManager;
@@ -98,7 +96,8 @@ namespace KiarcheContinuumWar.Editor
             
             // 9. Создать EventSystem
             GameObject eventSystemObj = new GameObject("EventSystem");
-            var eventSystem = eventSystemObj.AddComponent<UnityEngine.EventSystems.EventSystem>();
+            eventSystemObj.AddComponent<UnityEngine.EventSystems.EventSystem>();
+            eventSystemObj.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
             
             // Сохранить сцену
             string path = "Assets/Scenes/MVP_Prototype.unity";
@@ -132,23 +131,33 @@ namespace KiarcheContinuumWar.Editor
             return panel;
         }
         
-        private static GameObject CreateSelectedUnitsText(Transform parent)
+        private static GameObject CreateUnitPanel(Transform parent)
         {
-            GameObject textObj = new GameObject("SelectedUnitsText");
-            textObj.transform.SetParent(parent);
-            
-            RectTransform rect = textObj.AddComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.5f, 0);
-            rect.anchorMax = new Vector2(0.5f, 0);
-            rect.pivot = new Vector2(0.5f, 0);
-            rect.anchoredPosition = new Vector2(0, 10);
-            rect.sizeDelta = new Vector2(200, 30);
-            
-            Text text = CreateText(textObj.transform, "", "Выделено: 0", Vector2.zero);
-            text.alignment = TextAnchor.MiddleCenter;
-            text.fontSize = 20;
-            
-            return textObj;
+            GameObject panel = new GameObject("UnitPanel");
+            panel.transform.SetParent(parent);
+
+            RectTransform rect = panel.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0, 0);
+            rect.anchorMax = new Vector2(0, 0);
+            rect.pivot = new Vector2(0, 0);
+            rect.anchoredPosition = new Vector2(16, 16);
+            rect.sizeDelta = new Vector2(320, 120);
+
+            Image image = panel.AddComponent<Image>();
+            image.color = new Color(0.05f, 0.08f, 0.12f, 0.78f);
+
+            Text selectedText = CreateText(panel.transform, "SelectedUnitsText", "Нет выделенных юнитов", new Vector2(12, -12));
+            selectedText.fontSize = 18;
+            selectedText.alignment = TextAnchor.UpperLeft;
+
+            Text detailsText = CreateText(panel.transform, "UnitDetailsText", "Выделите юнита или группу, чтобы увидеть состав и состояние.", new Vector2(12, -42));
+            detailsText.fontSize = 14;
+            detailsText.alignment = TextAnchor.UpperLeft;
+            detailsText.horizontalOverflow = HorizontalWrapMode.Wrap;
+            detailsText.verticalOverflow = VerticalWrapMode.Overflow;
+
+            panel.SetActive(false);
+            return panel;
         }
         
         private static Text CreateText(Transform parent, string name, string content, Vector2 position)

@@ -1,12 +1,13 @@
-using UnityEngine;
-using KiarcheContinuumWar.Units;
 using System.Linq;
+using UnityEngine;
+using KiarcheContinuumWar.Map;
+using KiarcheContinuumWar.Units;
 
 namespace KiarcheContinuumWar.InputSystem
 {
     /// <summary>
-    /// Обработка ввода для RTS управления (Input Manager).
-    /// Выделение юнитов, перемещение, атака.
+    /// Обработка ввода для RTS управления.
+    /// Выделение юнитов, перемещение и атака.
     /// </summary>
     public class RTSInput : MonoBehaviour
     {
@@ -16,14 +17,12 @@ namespace KiarcheContinuumWar.InputSystem
 
         [Header("Selection Settings")]
         [SerializeField] private float minDragDistance = 10f;
-        [SerializeField] private Color dragColor = new Color(0, 1, 0, 0.3f);
+        [SerializeField] private Color dragColor = new Color(0f, 1f, 0f, 0.3f);
+        [SerializeField] private float clickRayDistance = 2000f;
 
-        // Состояние ввода
         private Vector2 _startMousePosition;
         private Vector2 _currentMousePosition;
-        private bool _isDragging = false;
-
-        // Rect выделения
+        private bool _isDragging;
         private Rect _selectionRect;
 
         private void Start()
@@ -37,13 +36,10 @@ namespace KiarcheContinuumWar.InputSystem
             {
                 unitController = FindAnyObjectByType<UnitController>();
             }
-            
-            Debug.Log("[RTSInput] Инициализирован");
         }
 
-        private void Update()
+        private void LateUpdate()
         {
-            // Левая кнопка мыши - выделение
             if (Input.GetMouseButtonDown(0))
             {
                 _startMousePosition = Input.mousePosition;
@@ -54,7 +50,7 @@ namespace KiarcheContinuumWar.InputSystem
             if (Input.GetMouseButton(0))
             {
                 _currentMousePosition = Input.mousePosition;
-                float dragDistance = Vector2.Distance(Input.mousePosition, _startMousePosition);
+                float dragDistance = Vector2.Distance(_currentMousePosition, _startMousePosition);
                 if (dragDistance > minDragDistance)
                 {
                     _isDragging = true;
@@ -65,19 +61,16 @@ namespace KiarcheContinuumWar.InputSystem
             {
                 if (_isDragging)
                 {
-                    // Выделение рамкой
                     EndDragSelection();
                 }
                 else
                 {
-                    // Клик - выделение одного юнита или снятие выделения
                     HandleClick();
                 }
 
                 _isDragging = false;
             }
 
-            // Правая кнопка мыши - приказ
             if (Input.GetMouseButtonDown(1))
             {
                 HandleRightClick();
@@ -86,72 +79,124 @@ namespace KiarcheContinuumWar.InputSystem
 
         private void HandleClick()
         {
-            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-
-            if (Physics.Raycast(ray, out RaycastHit hit, 1000f))
+            if (TryGetTopmostUnitUnderMouse(Input.mousePosition, out Unit unit))
             {
-                // Ищем юнита: проверяем hit.collider.gameObject и его родителей
-                Unit unit = hit.collider.GetComponent<Unit>();
-
-                if (unit == null)
-                {
-                    unit = hit.collider.GetComponentInParent<Unit>();
-                }
-
-                // Если всё ещё null, проверяем children (вдруг попали в родителя)
-                if (unit == null)
-                {
-                    unit = hit.collider.GetComponentInChildren<Unit>();
-                }
-
-                if (unit != null && unit.IsAlive)
-                {
-                    // Клик по юниту — выделить только его (заменить выделение)
-                    unitController.SelectUnit(unit);
-                }
-                else
-                {
-                    // Клик по земле — снять выделение
-                    unitController.DeselectAll();
-                }
+                unitController.SelectUnit(unit);
+                return;
             }
-            else
-            {
-                unitController.DeselectAll();
-            }
+
+            unitController.DeselectAll();
         }
 
         private void HandleRightClick()
         {
-            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-
-            if (Physics.Raycast(ray, out RaycastHit hit))
+            if (unitController == null || unitController.SelectedUnits.Count == 0)
             {
-                Unit unit = hit.collider.GetComponent<Unit>();
+                return;
+            }
+
+            Vector2 pointerPosition = Input.mousePosition;
+
+            if (TryGetTopmostUnitUnderMouse(pointerPosition, out Unit targetUnit) &&
+                !unitController.SelectedUnits.Contains(targetUnit))
+            {
+                unitController.IssueAttackOrder(targetUnit);
+                return;
+            }
+
+            if (!TryGetGroundPosition(pointerPosition, out Vector3 targetPosition))
+            {
+                return;
+            }
+
+            unitController.IssueMoveOrder(targetPosition);
+        }
+
+        private bool TryGetTopmostUnitUnderMouse(Vector2 mousePosition, out Unit unit)
+        {
+            unit = null;
+
+            if (mainCamera == null)
+            {
+                return false;
+            }
+
+            Ray ray = mainCamera.ScreenPointToRay(mousePosition);
+            RaycastHit[] hits = Physics.RaycastAll(
+                    ray,
+                    clickRayDistance,
+                    Physics.DefaultRaycastLayers,
+                    QueryTriggerInteraction.Ignore)
+                .OrderBy(hit => hit.distance)
+                .ToArray();
+
+            foreach (RaycastHit hit in hits)
+            {
+                unit = hit.collider.GetComponent<Unit>()
+                    ?? hit.collider.GetComponentInParent<Unit>()
+                    ?? hit.collider.GetComponentInChildren<Unit>();
+
                 if (unit != null && unit.IsAlive)
                 {
-                    if (!unitController.SelectedUnits.Contains(unit))
-                    {
-                        unitController.IssueAttackOrder(unit);
-                    }
-                }
-                else
-                {
-                    // Используем точку на поверхности terrain
-                    Vector3 targetPosition = hit.point;
-
-                    // Отладка: показываем точку назначения
-                    Debug.Log($"[RTSInput] Move order to: {targetPosition} (mouse: {Input.mousePosition})");
-                    Debug.DrawLine(ray.origin, targetPosition, Color.green, 2f);
-
-                    unitController.IssueMoveOrder(targetPosition);
+                    return true;
                 }
             }
+
+            unit = null;
+            return false;
+        }
+
+        private bool TryGetGroundPosition(Vector2 mousePosition, out Vector3 groundPosition)
+        {
+            groundPosition = Vector3.zero;
+
+            if (mainCamera == null)
+            {
+                return false;
+            }
+
+            Ray ray = mainCamera.ScreenPointToRay(mousePosition);
+            RaycastHit[] hits = Physics.RaycastAll(
+                    ray,
+                    clickRayDistance,
+                    Physics.DefaultRaycastLayers,
+                    QueryTriggerInteraction.Ignore)
+                .OrderBy(hit => hit.distance)
+                .ToArray();
+
+            foreach (RaycastHit hit in hits)
+            {
+                if (hit.collider is TerrainCollider)
+                {
+                    groundPosition = hit.point;
+                    return true;
+                }
+            }
+
+            Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
+            if (!groundPlane.Raycast(ray, out float enter))
+            {
+                return false;
+            }
+
+            groundPosition = ProjectPointToTerrain(ray.GetPoint(enter));
+            return true;
+        }
+
+        private Vector3 ProjectPointToTerrain(Vector3 position)
+        {
+            MapManager mapManager = MapManager.Instance;
+            if (mapManager == null)
+            {
+                return position;
+            }
+
+            position = mapManager.ClampToBounds(position);
+            return new Vector3(position.x, mapManager.GetTerrainHeight(position), position.z);
         }
 
         private void EndDragSelection()
         {
-            // Преобразуем координаты для SelectUnitsInRect (GUI использует Y от верха)
             float startX = _startMousePosition.x;
             float startY = Screen.height - _startMousePosition.y;
             float endX = _currentMousePosition.x;
@@ -163,35 +208,34 @@ namespace KiarcheContinuumWar.InputSystem
             float height = Mathf.Abs(endY - startY);
 
             _selectionRect = new Rect(x, y, width, height);
-            
-            Debug.Log($"[RTSInput] Selection rect: {_selectionRect}");
             unitController.SelectUnitsInRect(_selectionRect, mainCamera);
         }
 
         private void OnGUI()
         {
-            if (_isDragging)
+            if (!_isDragging)
             {
-                // GUI использует Y от верха экрана, инвертируем
-                float startX = _startMousePosition.x;
-                float startY = Screen.height - _startMousePosition.y;
-                float endX = _currentMousePosition.x;
-                float endY = Screen.height - _currentMousePosition.y;
-
-                float x = Mathf.Min(startX, endX);
-                float y = Mathf.Min(startY, endY);
-                float width = Mathf.Abs(endX - startX);
-                float height = Mathf.Abs(endY - startY);
-
-                Rect rect = new Rect(x, y, width, height);
-
-                Color originalColor = GUI.color;
-                GUI.color = dragColor;
-                GUI.DrawTexture(rect, Texture2D.whiteTexture);
-                GUI.color = originalColor;
-
-                GUI.Box(rect, "", GetSelectionStyle());
+                return;
             }
+
+            float startX = _startMousePosition.x;
+            float startY = Screen.height - _startMousePosition.y;
+            float endX = _currentMousePosition.x;
+            float endY = Screen.height - _currentMousePosition.y;
+
+            float x = Mathf.Min(startX, endX);
+            float y = Mathf.Min(startY, endY);
+            float width = Mathf.Abs(endX - startX);
+            float height = Mathf.Abs(endY - startY);
+
+            Rect rect = new Rect(x, y, width, height);
+
+            Color originalColor = GUI.color;
+            GUI.color = dragColor;
+            GUI.DrawTexture(rect, Texture2D.whiteTexture);
+            GUI.color = originalColor;
+
+            GUI.Box(rect, string.Empty, GetSelectionStyle());
         }
 
         private GUIStyle GetSelectionStyle()
@@ -200,16 +244,6 @@ namespace KiarcheContinuumWar.InputSystem
             style.normal.background = Texture2D.whiteTexture;
             style.normal.textColor = Color.green;
             return style;
-        }
-
-        private void OnDrawGizmos()
-        {
-            if (Application.isPlaying && mainCamera != null)
-            {
-                Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-                Gizmos.color = Color.red;
-                Gizmos.DrawRay(ray.origin, ray.direction * 100);
-            }
         }
     }
 }
