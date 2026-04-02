@@ -35,7 +35,7 @@ export function Header() {
         </nav>
 
         <button
-          className="menu-toggle"
+          className={`menu-toggle ${isMenuOpen ? 'is-active' : ''}`}
           onClick={toggleMenu}
           aria-label="Toggle menu"
           aria-expanded={isMenuOpen}
