@@ -4,6 +4,9 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using KiarcheContinuumWar.Map;
+using KiarcheContinuumWar.Core;
+using KiarcheContinuumWar.UI;
+using UnityEngine.UI;
 
 namespace KiarcheContinuumWar.Editor
 {
@@ -32,10 +35,13 @@ namespace KiarcheContinuumWar.Editor
             CreateSpawnPoints();
             CreateMapManager();
             CreateFlowFieldManager();
+            CreateResourceManager();
             CreateGameManager();
             CreateUnitController();
             CreateRTSInput();
             SetupCamera();
+            CreateHUD();
+            CreateEventSystem();
 
             string path = EditorUtility.SaveFilePanelInProject(
                 "Save Test Map",
@@ -307,9 +313,18 @@ namespace KiarcheContinuumWar.Editor
             serializedObject.FindProperty("testUnitCount").intValue = 12;
             serializedObject.FindProperty("spawnPosition1").vector3Value = new Vector3(-36f, 0f, 0f);
             serializedObject.FindProperty("spawnPosition2").vector3Value = new Vector3(36f, 0f, 0f);
+            serializedObject.FindProperty("resourceManager").objectReferenceValue = Object.FindAnyObjectByType<ResourceManager>();
+            serializedObject.FindProperty("unitController").objectReferenceValue = Object.FindAnyObjectByType<KiarcheContinuumWar.Units.UnitController>();
             serializedObject.ApplyModifiedProperties();
 
             Debug.Log("[GenerateTestMap] GameManager создан");
+        }
+
+        private static void CreateResourceManager()
+        {
+            GameObject resourceObj = new GameObject("ResourceManager");
+            resourceObj.AddComponent<ResourceManager>();
+            Debug.Log("[GenerateTestMap] ResourceManager создан");
         }
 
         private static void CreateUnitController()
@@ -333,6 +348,103 @@ namespace KiarcheContinuumWar.Editor
             }
 
             Debug.Log("[GenerateTestMap] RTSInput создан");
+        }
+
+        private static void CreateHUD()
+        {
+            GameObject canvasObj = new GameObject("Canvas");
+            Canvas canvas = canvasObj.AddComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+
+            CanvasScaler scaler = canvasObj.AddComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920, 1080);
+            scaler.matchWidthOrHeight = 0.5f;
+
+            canvasObj.AddComponent<GraphicRaycaster>();
+
+            GameUI gameUI = canvasObj.AddComponent<GameUI>();
+            gameUI.materialsText = CreateHudText(canvasObj.transform, "MaterialsText", new Vector2(28f, -22f), "Материалы: 100", 18);
+            gameUI.energyText = CreateHudText(canvasObj.transform, "EnergyText", new Vector2(28f, -48f), "Энергия: 100", 18);
+            gameUI.foodText = CreateHudText(canvasObj.transform, "FoodText", new Vector2(28f, -74f), "Еда: 100", 18);
+            gameUI.knowledgeText = CreateHudText(canvasObj.transform, "KnowledgeText", new Vector2(28f, -100f), "Знания: 50", 18);
+
+            GameObject resourcesPanel = CreatePanel(canvasObj.transform, "ResourcesPanel", new Vector2(16f, -16f), new Vector2(280f, 140f), true);
+            gameUI.materialsText.transform.SetParent(resourcesPanel.transform, false);
+            gameUI.energyText.transform.SetParent(resourcesPanel.transform, false);
+            gameUI.foodText.transform.SetParent(resourcesPanel.transform, false);
+            gameUI.knowledgeText.transform.SetParent(resourcesPanel.transform, false);
+
+            GameObject unitPanel = CreatePanel(canvasObj.transform, "UnitPanel", new Vector2(16f, 16f), new Vector2(340f, 120f), false);
+            gameUI.unitPanel = unitPanel;
+            gameUI.selectedUnitsText = CreateHudText(unitPanel.transform, "SelectedUnitsText", new Vector2(12f, -12f), "Нет выделенных юнитов", 20);
+            gameUI.unitDetailsText = CreateHudText(unitPanel.transform, "UnitDetailsText", new Vector2(12f, -42f), "Выделите юнита или группу, чтобы увидеть состав и состояние.", 14);
+            gameUI.unitDetailsText.horizontalOverflow = HorizontalWrapMode.Wrap;
+            gameUI.unitDetailsText.verticalOverflow = VerticalWrapMode.Overflow;
+            unitPanel.SetActive(false);
+
+            Debug.Log("[GenerateTestMap] HUD создан");
+        }
+
+        private static void CreateEventSystem()
+        {
+            if (Object.FindAnyObjectByType<UnityEngine.EventSystems.EventSystem>() != null)
+            {
+                return;
+            }
+
+            GameObject eventSystemObj = new GameObject("EventSystem");
+            eventSystemObj.AddComponent<UnityEngine.EventSystems.EventSystem>();
+            eventSystemObj.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
+            Debug.Log("[GenerateTestMap] EventSystem создан");
+        }
+
+        private static GameObject CreatePanel(Transform parent, string name, Vector2 anchoredPosition, Vector2 size, bool topLeft)
+        {
+            GameObject panel = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            panel.transform.SetParent(parent, false);
+
+            RectTransform rect = panel.GetComponent<RectTransform>();
+            if (topLeft)
+            {
+                rect.anchorMin = new Vector2(0f, 1f);
+                rect.anchorMax = new Vector2(0f, 1f);
+                rect.pivot = new Vector2(0f, 1f);
+            }
+            else
+            {
+                rect.anchorMin = new Vector2(0f, 0f);
+                rect.anchorMax = new Vector2(0f, 0f);
+                rect.pivot = new Vector2(0f, 0f);
+            }
+
+            rect.anchoredPosition = anchoredPosition;
+            rect.sizeDelta = size;
+
+            Image image = panel.GetComponent<Image>();
+            image.color = new Color(0.05f, 0.08f, 0.12f, 0.78f);
+            return panel;
+        }
+
+        private static Text CreateHudText(Transform parent, string name, Vector2 position, string content, int fontSize)
+        {
+            GameObject textObj = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
+            textObj.transform.SetParent(parent, false);
+
+            RectTransform rect = textObj.GetComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0f, 1f);
+            rect.anchorMax = new Vector2(1f, 1f);
+            rect.pivot = new Vector2(0f, 1f);
+            rect.anchoredPosition = position;
+            rect.sizeDelta = new Vector2(-24f, 24f);
+
+            Text text = textObj.GetComponent<Text>();
+            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            text.fontSize = fontSize;
+            text.color = Color.white;
+            text.alignment = TextAnchor.UpperLeft;
+            text.text = content;
+            return text;
         }
 
         private static void CreateObstacleGroupMarker(string name, Vector3 position, Transform parent)
