@@ -1,5 +1,31 @@
 .section {
   width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.section::before,
+.section::after {
+  content: "";
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+.section::before {
+  top: 20px;
+  left: 20px;
+  border-top: 2px solid var(--color-accent-glow);
+  border-left: 2px solid var(--color-accent-glow);
+}
+
+.section::after {
+  bottom: 20px;
+  right: 20px;
+  border-bottom: 2px solid var(--color-accent-glow);
+  border-right: 2px solid var(--color-accent-glow);
 }
 
 .section--default {
@@ -36,10 +62,14 @@
 }
 
 .section-title {
-  font-size: 2rem;
-  font-weight: 700;
+  font-family: var(--font-family-heading);
+  font-size: 2.5rem; /* Increased size */
+  font-weight: 800;
   color: #fff;
   margin: 0 0 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
 }
 
 .section-subtitle {

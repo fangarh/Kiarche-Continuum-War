@@ -11,26 +11,18 @@ export function HomePage() {
   const video1Ref = useRef<HTMLVideoElement>(null);
   const video2Ref = useRef<HTMLVideoElement>(null);
 
-  useEffect(() => {
-    const videos = [
-      { src: '/assets/concepts/kiarche-hero.mp4', duration: 10000 },
-      { src: '/assets/concepts/pixverse-v5-hero.mp4', duration: 10000 },
-    ];
-
-    const timeout = setTimeout(() => {
-      setIsTransitioning(true);
-      setTimeout(() => {
-        setActiveVideo((prev) => (prev + 1) % videos.length);
-        setIsTransitioning(false);
-      }, 1500);
-    }, videos[activeVideo].duration);
-
-    return () => clearTimeout(timeout);
-  }, [activeVideo]);
+  const handleVideoEnd = () => {
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setActiveVideo((prev) => (prev + 1) % 2);
+      setIsTransitioning(false);
+    }, 1000); // 1s transition
+  };
 
   useEffect(() => {
     const activeVideoEl = activeVideo === 0 ? video1Ref.current : video2Ref.current;
     if (activeVideoEl) {
+      activeVideoEl.currentTime = 0;
       activeVideoEl.play().catch(() => {});
     }
   }, [activeVideo]);
@@ -45,8 +37,8 @@ export function HomePage() {
             className={`hero-video ${activeVideo === 0 ? 'active' : ''} ${isTransitioning && activeVideo === 0 ? 'fade-out' : ''}`}
             autoPlay
             muted
-            loop
             playsInline
+            onEnded={handleVideoEnd}
             poster="/assets/concepts/kiarche/1774598701.png"
           >
             <source src="/assets/concepts/kiarche-hero.mp4" type="video/mp4" />
@@ -56,8 +48,8 @@ export function HomePage() {
             className={`hero-video ${activeVideo === 1 ? 'active' : ''} ${isTransitioning && activeVideo === 1 ? 'fade-out' : ''}`}
             autoPlay
             muted
-            loop
             playsInline
+            onEnded={handleVideoEnd}
           >
             <source src="/assets/concepts/pixverse-v5-hero.mp4" type="video/mp4" />
           </video>
@@ -66,7 +58,7 @@ export function HomePage() {
           <div className="hero-particles"></div>
         </div>
         <div className="hero-content">
-          <h1 className="hero-title">{hero.title}</h1>
+          <h1 className="hero-title" data-text={hero.title}>{hero.title}</h1>
           <p className="hero-tagline">{hero.tagline}</p>
           <div className="hero-actions">
             <Button variant="primary" size="lg" to="/overview">
