@@ -63,9 +63,14 @@ namespace KiarcheContinuumWar.Units
         /// </summary>
         public void SetTargetPosition(Vector3 position)
         {
+            SetTargetPosition(position, true);
+        }
+
+        public void SetTargetPosition(Vector3 position, bool rebuildFlowField)
+        {
             if (_pathfinder != null)
             {
-                _pathfinder.SetTargetPosition(position);
+                _pathfinder.SetTargetPosition(position, rebuildFlowField);
             }
         }
 

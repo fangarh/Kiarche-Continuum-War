@@ -1,12 +1,11 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace KiarcheContinuumWar.Units
 {
     /// <summary>
     /// Контроллер группы юнитов.
-    /// Управляет выделением, перемещением и атакой группы.
+    /// Управляет выделением, перемещением и атакой.
     /// </summary>
     public class UnitController : MonoBehaviour
     {
@@ -14,14 +13,11 @@ namespace KiarcheContinuumWar.Units
         [SerializeField] private float selectionRadius = 0.5f;
         [SerializeField] private float formationSpacing = 1.5f;
 
-        // Выделенные юниты
-        private List<Unit> _selectedUnits = new List<Unit>();
+        private readonly List<Unit> _selectedUnits = new List<Unit>();
         public IReadOnlyList<Unit> SelectedUnits => _selectedUnits;
 
-        // Все юниты на сцене
-        private List<Unit> _allUnits = new List<Unit>();
+        private readonly List<Unit> _allUnits = new List<Unit>();
 
-        // Позиция для атаки/перемещения
         private Vector3 _targetPosition;
         private Unit _targetUnit;
 
@@ -30,99 +26,84 @@ namespace KiarcheContinuumWar.Units
 
         private void Start()
         {
-            // Найти все юниты на сцене
             FindAllUnits();
         }
 
-        /// <summary>
-        /// Найти все юниты на сцене.
-        /// </summary>
         public void FindAllUnits()
         {
             _allUnits.Clear();
             Unit[] units = FindObjectsByType<Unit>(FindObjectsInactive.Include);
             _allUnits.AddRange(units);
 
-            // Подписаться на события смерти
-            foreach (var unit in _allUnits)
+            foreach (Unit unit in _allUnits)
             {
+                unit.OnUnitDied -= HandleUnitDied;
                 unit.OnUnitDied += HandleUnitDied;
             }
         }
 
-        /// <summary>
-        /// Выделить одного юнита.
-        /// </summary>
         public void SelectUnit(Unit unit)
         {
             DeselectAll();
             AddToSelection(unit);
         }
 
-        /// <summary>
-        /// Добавить юнита к выделенным.
-        /// </summary>
         public void AddToSelection(Unit unit)
         {
-            if (!_selectedUnits.Contains(unit))
+            if (unit == null || _selectedUnits.Contains(unit))
             {
-                _selectedUnits.Add(unit);
-                unit.Select();
+                return;
             }
+
+            _selectedUnits.Add(unit);
+            unit.Select();
         }
 
-        /// <summary>
-        /// Снять выделение с юнита.
-        /// </summary>
         public void RemoveFromSelection(Unit unit)
         {
-            if (_selectedUnits.Contains(unit))
+            if (unit == null || !_selectedUnits.Contains(unit))
             {
-                _selectedUnits.Remove(unit);
-                unit.Deselect();
+                return;
             }
+
+            _selectedUnits.Remove(unit);
+            unit.Deselect();
         }
 
-        /// <summary>
-        /// Снять выделение со всех юнитов.
-        /// </summary>
         public void DeselectAll()
         {
-            foreach (var unit in _selectedUnits)
+            foreach (Unit unit in _selectedUnits)
             {
                 unit.Deselect();
             }
+
             _selectedUnits.Clear();
         }
 
-        /// <summary>
-        /// Выделить юнитов в прямоугольной области.
-        /// </summary>
         public void SelectUnitsInRect(Rect rect, Camera camera)
         {
             DeselectAll();
 
-            foreach (var unit in _allUnits)
+            foreach (Unit unit in _allUnits)
             {
-                if (!unit.IsAlive) continue;
-
-                Vector3 screenPoint = camera.WorldToScreenPoint(unit.transform.position);
-
-                // Проверка: юнит перед камерой
-                if (screenPoint.z < 0) continue;
-
-                // Проверка: экранные координаты в пределах экрана
-                if (screenPoint.x < 0 || screenPoint.x > Screen.width ||
-                    screenPoint.y < 0 || screenPoint.y > Screen.height)
+                if (!unit.IsAlive)
                 {
                     continue;
                 }
 
-                // WorldToScreenPoint использует Y от низа (0..Screen.height)
-                // rect использует Y от верха (0..Screen.height), поэтому инвертируем
-                float invertedY = Screen.height - screenPoint.y;
+                Vector3 screenPoint = camera.WorldToScreenPoint(unit.transform.position);
+                if (screenPoint.z < 0f)
+                {
+                    continue;
+                }
 
-                // Проверка: юнит в пределах rect
+                if (screenPoint.x < 0f || screenPoint.x > Screen.width ||
+                    screenPoint.y < 0f || screenPoint.y > Screen.height)
+                {
+                    continue;
+                }
+
+                float invertedY = Screen.height - screenPoint.y;
                 if (screenPoint.x >= rect.xMin &&
                     screenPoint.x <= rect.xMax &&
                     invertedY >= rect.yMin &&
@@ -133,29 +114,26 @@ namespace KiarcheContinuumWar.Units
             }
         }
 
-        /// <summary>
-        /// Отдать приказ о перемещении.
-        /// </summary>
         public void IssueMoveOrder(Vector3 targetPosition)
         {
             _targetPosition = targetPosition;
             _targetUnit = null;
 
-            if (_selectedUnits.Count == 0) return;
+            if (_selectedUnits.Count == 0)
+            {
+                return;
+            }
 
-            // Распределить юнитов в формации
+            var flowFieldManager = FindAnyObjectByType<KiarcheContinuumWar.Pathfinding.FlowFieldManager>();
+            flowFieldManager?.GenerateFlowField(targetPosition);
             IssueFormationMove(targetPosition);
         }
 
-        /// <summary>
-        /// Отдать приказ об атаке позиции.
-        /// </summary>
         public void IssueAttackOrder(Vector3 targetPosition)
         {
             _targetPosition = targetPosition;
             _targetUnit = null;
 
-            // Найти ближайшего врага к позиции
             Unit nearestEnemy = FindNearestEnemy(targetPosition);
             if (nearestEnemy != null)
             {
@@ -163,35 +141,33 @@ namespace KiarcheContinuumWar.Units
             }
         }
 
-        /// <summary>
-        /// Отдать приказ об атаке юнита.
-        /// </summary>
         public void IssueAttackOrder(Unit targetUnit)
         {
             _targetUnit = targetUnit;
             _targetPosition = Vector3.zero;
 
-            if (_selectedUnits.Count == 0) return;
+            if (_selectedUnits.Count == 0)
+            {
+                return;
+            }
 
-            // Все юниты атакуют цель
-            foreach (var unit in _selectedUnits)
+            foreach (Unit unit in _selectedUnits)
             {
                 unit.SetTarget(targetUnit);
             }
         }
 
-        /// <summary>
-        /// Найти ближайшего врага к позиции.
-        /// </summary>
         public Unit FindNearestEnemy(Vector3 position)
         {
             Unit nearest = null;
             float nearestDistance = float.MaxValue;
 
-            foreach (var unit in _allUnits)
+            foreach (Unit unit in _allUnits)
             {
-                if (!unit.IsAlive) continue;
-                if (_selectedUnits.Contains(unit)) continue; // Не атаковать своих
+                if (!unit.IsAlive || _selectedUnits.Contains(unit))
+                {
+                    continue;
+                }
 
                 float distance = Vector3.Distance(position, unit.transform.position);
                 if (distance < nearestDistance)
@@ -204,63 +180,94 @@ namespace KiarcheContinuumWar.Units
             return nearest;
         }
 
-        /// <summary>
-        /// Распределить юнитов в формации с улучшенным размещением.
-        /// </summary>
         private void IssueFormationMove(Vector3 targetPosition)
         {
             int count = _selectedUnits.Count;
-            if (count == 0) return;
+            if (count == 0)
+            {
+                return;
+            }
 
-            // Улучшенная формация: несколько кругов для больших групп
+            Vector3[] offsets = new Vector3[count];
+            Vector3 centroid = Vector3.zero;
+
             for (int i = 0; i < count; i++)
             {
-                Vector3 offset = GetFormationOffset(i, count);
-                
-                // Добавляем случайное небольшое смещение для предотвращения наложения
-                Vector3 randomOffset = new Vector3(
-                    Random.Range(-0.2f, 0.2f),
-                    0,
-                    Random.Range(-0.2f, 0.2f)
-                );
-                
-                Vector3 finalPosition = targetPosition + offset + randomOffset;
-                _selectedUnits[i].SetTargetPosition(finalPosition);
+                offsets[i] = GetFormationOffset(i, count);
+                centroid += offsets[i];
+            }
+
+            centroid /= count;
+
+            List<Vector3> availableSlots = new List<Vector3>(count);
+
+            for (int i = 0; i < count; i++)
+            {
+                Vector3 centeredOffset = offsets[i] - centroid;
+                availableSlots.Add(targetPosition + centeredOffset);
+            }
+
+            List<Unit> remainingUnits = new List<Unit>(_selectedUnits);
+            while (remainingUnits.Count > 0 && availableSlots.Count > 0)
+            {
+                int bestUnitIndex = 0;
+                int bestSlotIndex = 0;
+                float bestDistance = float.MaxValue;
+
+                for (int unitIndex = 0; unitIndex < remainingUnits.Count; unitIndex++)
+                {
+                    Vector3 unitPosition = remainingUnits[unitIndex].transform.position;
+
+                    for (int slotIndex = 0; slotIndex < availableSlots.Count; slotIndex++)
+                    {
+                        float distance = Vector3.SqrMagnitude(unitPosition - availableSlots[slotIndex]);
+                        if (distance < bestDistance)
+                        {
+                            bestDistance = distance;
+                            bestUnitIndex = unitIndex;
+                            bestSlotIndex = slotIndex;
+                        }
+                    }
+                }
+
+                Unit selectedUnit = remainingUnits[bestUnitIndex];
+                Vector3 assignedSlot = availableSlots[bestSlotIndex];
+                selectedUnit.SetTargetPosition(assignedSlot, false);
+
+                remainingUnits.RemoveAt(bestUnitIndex);
+                availableSlots.RemoveAt(bestSlotIndex);
             }
         }
 
-        /// <summary>
-        /// Получить смещение для формации.
-        /// </summary>
         private Vector3 GetFormationOffset(int index, int totalCount)
         {
-            if (totalCount == 1) return Vector3.zero;
+            if (totalCount == 1)
+            {
+                return Vector3.zero;
+            }
 
-            // Улучшенная формация: спираль/несколько кругов
-            float angle, radius;
-            
+            float angle;
+            float radius;
+
             if (totalCount <= 6)
             {
-                // Для маленьких групп - один круг
-                angle = (index / (float)totalCount) * Mathf.PI * 2;
+                angle = (index / (float)totalCount) * Mathf.PI * 2f;
                 radius = formationSpacing * Mathf.Sqrt(totalCount) * 0.8f;
             }
             else
             {
-                // Для больших групп - несколько кругов
                 int ring = Mathf.FloorToInt(Mathf.Sqrt(index));
                 int indexInRing = index - ring * ring;
                 int countInRing = ring == 0 ? 1 : ring * 6;
-                
-                angle = (indexInRing / (float)countInRing) * Mathf.PI * 2;
+
+                angle = (indexInRing / (float)countInRing) * Mathf.PI * 2f;
                 radius = formationSpacing * (ring + 1);
             }
 
             return new Vector3(
                 Mathf.Cos(angle) * radius,
-                0,
-                Mathf.Sin(angle) * radius
-            );
+                0f,
+                Mathf.Sin(angle) * radius);
         }
 
         private void HandleUnitDied(Unit unit)
@@ -271,10 +278,13 @@ namespace KiarcheContinuumWar.Units
 
         private void OnDrawGizmosSelected()
         {
-            // Отобразить выделенных юнитов
-            foreach (var unit in _selectedUnits)
+            foreach (Unit unit in _selectedUnits)
             {
-                if (unit == null) continue;
+                if (unit == null)
+                {
+                    continue;
+                }
+
                 Gizmos.color = Color.yellow;
                 Gizmos.DrawWireSphere(unit.transform.position, selectionRadius);
             }
