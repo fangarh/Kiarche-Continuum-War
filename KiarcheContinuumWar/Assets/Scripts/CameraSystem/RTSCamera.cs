@@ -24,6 +24,7 @@ namespace KiarcheContinuumWar.CameraSystem
         [SerializeField] private float mapHeight = 100f;
         [SerializeField] private float mapOriginX = -50f;
         [SerializeField] private float mapOriginZ = -50f;
+        [SerializeField] private float boundsPadding = 2f;
 
         [Header("Smooth Follow")]
         [SerializeField] private float smoothSpeed = 5f;
@@ -148,7 +149,8 @@ namespace KiarcheContinuumWar.CameraSystem
                 camRight.Normalize();
                 
                 Vector3 moveVector = (camForward * moveDirection.z) + (camRight * moveDirection.x);
-                _targetPosition += moveVector * moveSpeed * Time.deltaTime;
+                float zoomFactor = Mathf.Lerp(1.2f, 4.2f, Mathf.InverseLerp(minZoom, maxZoom, _currentZoom));
+                _targetPosition += moveVector * moveSpeed * zoomFactor * Time.deltaTime;
             }
 
             // Зум колёсиком
@@ -170,13 +172,13 @@ namespace KiarcheContinuumWar.CameraSystem
             {
                 _targetPosition.x = Mathf.Clamp(
                     _targetPosition.x,
-                    mapOriginX + 5,
-                    mapOriginX + mapWidth - 5
+                    mapOriginX + boundsPadding,
+                    mapOriginX + mapWidth - boundsPadding
                 );
                 _targetPosition.z = Mathf.Clamp(
                     _targetPosition.z,
-                    mapOriginZ + 5,
-                    mapOriginZ + mapHeight - 5
+                    mapOriginZ + boundsPadding,
+                    mapOriginZ + mapHeight - boundsPadding
                 );
             }
 

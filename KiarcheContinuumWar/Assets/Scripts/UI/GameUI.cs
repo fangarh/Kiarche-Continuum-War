@@ -1,14 +1,13 @@
+using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using KiarcheContinuumWar.Core;
 using KiarcheContinuumWar.Units;
-using System.Text;
 
 namespace KiarcheContinuumWar.UI
 {
     /// <summary>
     /// Базовый HUD для RTS.
-    /// Отображает ресурсы, выделенных юнитов, панель команд.
     /// </summary>
     public class GameUI : MonoBehaviour
     {
@@ -28,10 +27,12 @@ namespace KiarcheContinuumWar.UI
         [SerializeField] private UnitController unitController;
 
         private Font _defaultFont;
+        private Vector2Int _lastScreenSize;
 
         private void Awake()
         {
             _defaultFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            EnsureCanvasLayout();
             EnsureHudReferences();
         }
 
@@ -43,40 +44,40 @@ namespace KiarcheContinuumWar.UI
             if (unitController == null)
                 unitController = FindAnyObjectByType<UnitController>();
 
-            // Подписаться на события
             if (resourceManager != null)
             {
                 resourceManager.OnResourceChanged += UpdateResourceDisplay;
             }
 
             UpdateResourceDisplay();
+            UpdateUnitDisplay();
         }
 
         private void Update()
         {
+            EnsureCanvasLayout();
             UpdateUnitDisplay();
         }
 
         private void UpdateResourceDisplay(ResourceType type = ResourceType.Materials, int amount = 0)
         {
-            if (resourceManager == null) return;
+            if (resourceManager == null)
+                return;
 
             if (materialsText != null)
                 materialsText.text = $"Материалы: {resourceManager.Materials}";
-            
             if (energyText != null)
                 energyText.text = $"Энергия: {resourceManager.Energy}";
-            
             if (foodText != null)
                 foodText.text = $"Еда: {resourceManager.Food}";
-            
             if (knowledgeText != null)
                 knowledgeText.text = $"Знания: {resourceManager.Knowledge}";
         }
 
         private void UpdateUnitDisplay()
         {
-            if (unitController == null) return;
+            if (unitController == null)
+                return;
 
             int selectedCount = unitController.SelectedUnits.Count;
             if (selectedCount > 0)
@@ -107,9 +108,7 @@ namespace KiarcheContinuumWar.UI
         {
             var selectedUnits = unitController.SelectedUnits;
             if (selectedUnits.Count == 0)
-            {
                 return string.Empty;
-            }
 
             float totalHealth = 0f;
             float totalDamage = 0f;
@@ -149,42 +148,81 @@ namespace KiarcheContinuumWar.UI
             if (unitDetailsText == null)
                 unitDetailsText = FindText("UnitDetailsText");
             if (unitPanel == null)
-                unitPanel = transform.Find("UnitPanel")?.gameObject;
+                unitPanel = FindPanel("UnitPanel")?.gameObject;
 
             EnsureResourcesPanel();
             EnsureUnitPanel();
         }
 
-        private void EnsureResourcesPanel()
+        private void EnsureCanvasLayout()
         {
-            RectTransform resourcesPanel = transform.Find("ResourcesPanel") as RectTransform;
-            if (resourcesPanel == null)
+            Vector2Int currentScreenSize = new Vector2Int(Screen.width, Screen.height);
+            if (_lastScreenSize == currentScreenSize && _lastScreenSize != Vector2Int.zero)
             {
-                resourcesPanel = CreatePanel("ResourcesPanel", new Vector2(16f, -16f), new Vector2(260f, 132f), TextAnchor.UpperLeft);
+                return;
             }
 
-            materialsText = EnsurePanelText(resourcesPanel, "MaterialsText", new Vector2(12f, -12f), "Материалы: 0");
-            energyText = EnsurePanelText(resourcesPanel, "EnergyText", new Vector2(12f, -38f), "Энергия: 0");
-            foodText = EnsurePanelText(resourcesPanel, "FoodText", new Vector2(12f, -64f), "Еда: 0");
-            knowledgeText = EnsurePanelText(resourcesPanel, "KnowledgeText", new Vector2(12f, -90f), "Знания: 0");
+            _lastScreenSize = currentScreenSize;
+
+            RectTransform rootRect = GetComponent<RectTransform>();
+            if (rootRect != null)
+            {
+                rootRect.anchorMin = Vector2.zero;
+                rootRect.anchorMax = Vector2.one;
+                rootRect.offsetMin = Vector2.zero;
+                rootRect.offsetMax = Vector2.zero;
+                rootRect.pivot = new Vector2(0.5f, 0.5f);
+                rootRect.localScale = Vector3.one;
+                rootRect.anchoredPosition = Vector2.zero;
+            }
+
+            Canvas canvas = GetComponentInParent<Canvas>();
+            if (canvas != null)
+            {
+                CanvasScaler scaler = canvas.GetComponent<CanvasScaler>();
+                if (scaler != null)
+                {
+                    scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+                    scaler.referenceResolution = new Vector2(1920f, 1080f);
+                    scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+                    scaler.matchWidthOrHeight = 0.5f;
+                }
+            }
+        }
+
+        private void EnsureResourcesPanel()
+        {
+            RectTransform resourcesPanel = FindPanel("ResourcesPanel");
+            if (resourcesPanel == null)
+            {
+                resourcesPanel = CreatePanel("ResourcesPanel", new Vector2(16f, -16f), new Vector2(340f, 136f), true);
+            }
+
+            ConfigurePanelLayout(resourcesPanel, new Vector2(16f, -16f), new Vector2(340f, 136f), true);
+            resourcesPanel.gameObject.SetActive(true);
+            resourcesPanel.SetAsLastSibling();
+
+            materialsText = EnsurePanelText(resourcesPanel, "MaterialsText", new Vector2(12f, -12f), "Материалы: 0", 18);
+            energyText = EnsurePanelText(resourcesPanel, "EnergyText", new Vector2(12f, -38f), "Энергия: 0", 18);
+            foodText = EnsurePanelText(resourcesPanel, "FoodText", new Vector2(12f, -64f), "Еда: 0", 18);
+            knowledgeText = EnsurePanelText(resourcesPanel, "KnowledgeText", new Vector2(12f, -90f), "Знания: 0", 18);
         }
 
         private void EnsureUnitPanel()
         {
-            RectTransform panel = unitPanel != null ? unitPanel.GetComponent<RectTransform>() : null;
+            RectTransform panel = unitPanel != null ? unitPanel.GetComponent<RectTransform>() : FindPanel("UnitPanel");
             if (panel == null)
             {
-                panel = CreatePanel("UnitPanel", new Vector2(16f, 16f), new Vector2(320f, 120f), TextAnchor.LowerLeft);
+                panel = CreatePanel("UnitPanel", new Vector2(16f, 16f), new Vector2(380f, 120f), false);
                 unitPanel = panel.gameObject;
             }
 
-            selectedUnitsText = EnsurePanelText(panel, "SelectedUnitsText", new Vector2(12f, -12f), "Нет выделенных юнитов");
-            selectedUnitsText.alignment = TextAnchor.UpperLeft;
-            selectedUnitsText.fontSize = 18;
+            ConfigurePanelLayout(panel, new Vector2(16f, 16f), new Vector2(380f, 120f), false);
+            panel.SetAsLastSibling();
+            unitPanel = panel.gameObject;
 
-            unitDetailsText = EnsurePanelText(panel, "UnitDetailsText", new Vector2(12f, -42f), "Выделите юнита или группу, чтобы увидеть состав и состояние.");
-            unitDetailsText.alignment = TextAnchor.UpperLeft;
-            unitDetailsText.fontSize = 14;
+            selectedUnitsText = EnsurePanelText(panel, "SelectedUnitsText", new Vector2(12f, -12f), "Нет выделенных юнитов", 18);
+            unitDetailsText = EnsurePanelText(panel, "UnitDetailsText", new Vector2(12f, -42f), "Выделите юнита или группу, чтобы увидеть состав и состояние.", 14);
             unitDetailsText.horizontalOverflow = HorizontalWrapMode.Wrap;
             unitDetailsText.verticalOverflow = VerticalWrapMode.Overflow;
 
@@ -192,76 +230,98 @@ namespace KiarcheContinuumWar.UI
                 unitPanel.SetActive(false);
         }
 
-        private RectTransform CreatePanel(string name, Vector2 anchoredPosition, Vector2 size, TextAnchor anchor)
+        private RectTransform CreatePanel(string name, Vector2 anchoredPosition, Vector2 size, bool topLeft)
         {
             GameObject panelObject = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
             panelObject.transform.SetParent(transform, false);
 
             RectTransform rectTransform = panelObject.GetComponent<RectTransform>();
-            switch (anchor)
+            ConfigurePanelLayout(rectTransform, anchoredPosition, size, topLeft);
+
+            Image image = panelObject.GetComponent<Image>();
+            image.color = new Color(0.05f, 0.08f, 0.12f, 0.82f);
+            return rectTransform;
+        }
+
+        private void ConfigurePanelLayout(RectTransform rectTransform, Vector2 anchoredPosition, Vector2 size, bool topLeft)
+        {
+            if (topLeft)
             {
-                case TextAnchor.UpperLeft:
-                    rectTransform.anchorMin = new Vector2(0f, 1f);
-                    rectTransform.anchorMax = new Vector2(0f, 1f);
-                    rectTransform.pivot = new Vector2(0f, 1f);
-                    break;
-                default:
-                    rectTransform.anchorMin = new Vector2(0f, 0f);
-                    rectTransform.anchorMax = new Vector2(0f, 0f);
-                    rectTransform.pivot = new Vector2(0f, 0f);
-                    break;
+                rectTransform.anchorMin = new Vector2(0f, 1f);
+                rectTransform.anchorMax = new Vector2(0f, 1f);
+                rectTransform.pivot = new Vector2(0f, 1f);
+            }
+            else
+            {
+                rectTransform.anchorMin = new Vector2(0f, 0f);
+                rectTransform.anchorMax = new Vector2(0f, 0f);
+                rectTransform.pivot = new Vector2(0f, 0f);
             }
 
             rectTransform.anchoredPosition = anchoredPosition;
             rectTransform.sizeDelta = size;
-
-            Image image = panelObject.GetComponent<Image>();
-            image.color = new Color(0.05f, 0.08f, 0.12f, 0.78f);
-            return rectTransform;
         }
 
-        private Text EnsurePanelText(RectTransform parent, string objectName, Vector2 anchoredPosition, string content)
+        private Text EnsurePanelText(RectTransform parent, string objectName, Vector2 anchoredPosition, string content, int fontSize)
         {
             Text text = FindText(objectName);
-            if (text != null && text.transform.parent == parent)
+            if (text == null || text.transform.parent != parent)
             {
-                return text;
+                Transform existingChild = parent.Find(objectName);
+                if (existingChild != null)
+                {
+                    text = existingChild.GetComponent<Text>();
+                }
             }
 
-            Transform existingChild = parent.Find(objectName);
-            if (existingChild != null)
+            if (text == null || text.transform.parent != parent)
             {
-                text = existingChild.GetComponent<Text>();
-                if (text != null)
-                    return text;
+                GameObject textObject = new GameObject(objectName, typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
+                textObject.transform.SetParent(parent, false);
+                text = textObject.GetComponent<Text>();
             }
 
-            GameObject textObject = new GameObject(objectName, typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
-            textObject.transform.SetParent(parent, false);
-
-            RectTransform rectTransform = textObject.GetComponent<RectTransform>();
-            rectTransform.anchorMin = new Vector2(0f, 1f);
-            rectTransform.anchorMax = new Vector2(1f, 1f);
-            rectTransform.pivot = new Vector2(0f, 1f);
-            rectTransform.anchoredPosition = anchoredPosition;
-            rectTransform.sizeDelta = new Vector2(-24f, 24f);
-
-            text = textObject.GetComponent<Text>();
+            ApplyTextLayout(text.rectTransform, anchoredPosition, parent.rect.width - 24f);
             text.font = _defaultFont;
-            text.fontSize = 14;
+            text.fontSize = fontSize;
             text.color = Color.white;
             text.alignment = TextAnchor.UpperLeft;
-            text.horizontalOverflow = HorizontalWrapMode.Wrap;
+            text.horizontalOverflow = HorizontalWrapMode.Overflow;
             text.verticalOverflow = VerticalWrapMode.Overflow;
             text.text = content;
             return text;
         }
 
+        private void ApplyTextLayout(RectTransform rectTransform, Vector2 anchoredPosition, float width)
+        {
+            rectTransform.anchorMin = new Vector2(0f, 1f);
+            rectTransform.anchorMax = new Vector2(0f, 1f);
+            rectTransform.pivot = new Vector2(0f, 1f);
+            rectTransform.anchoredPosition = anchoredPosition;
+            rectTransform.sizeDelta = new Vector2(Mathf.Max(width, 220f), 26f);
+        }
+
+        private RectTransform FindPanel(string objectName)
+        {
+            Transform direct = transform.Find(objectName);
+            if (direct != null)
+                return direct as RectTransform;
+
+            RectTransform[] panels = GetComponentsInChildren<RectTransform>(true);
+            foreach (RectTransform panel in panels)
+            {
+                if (panel.name == objectName)
+                    return panel;
+            }
+
+            return null;
+        }
+
         private Text FindText(string objectName)
         {
-            Transform target = transform.Find(objectName);
-            if (target != null)
-                return target.GetComponent<Text>();
+            Transform direct = transform.Find(objectName);
+            if (direct != null)
+                return direct.GetComponent<Text>();
 
             Text[] texts = GetComponentsInChildren<Text>(true);
             foreach (Text text in texts)

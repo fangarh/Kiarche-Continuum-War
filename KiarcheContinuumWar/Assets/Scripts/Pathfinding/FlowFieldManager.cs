@@ -67,10 +67,20 @@ namespace KiarcheContinuumWar.Pathfinding
 
         private void InitializeField()
         {
-            _fieldOrigin = new Vector3(
-                -fieldWidth * cellSize / 2f,
-                0f,
-                -fieldHeight * cellSize / 2f);
+            MapManager mapManager = MapManager.Instance;
+            if (mapManager != null)
+            {
+                fieldWidth = Mathf.Max(1, Mathf.CeilToInt(mapManager.MapWidth / cellSize));
+                fieldHeight = Mathf.Max(1, Mathf.CeilToInt(mapManager.MapHeight / cellSize));
+                _fieldOrigin = mapManager.MapOrigin;
+            }
+            else
+            {
+                _fieldOrigin = new Vector3(
+                    -fieldWidth * cellSize / 2f,
+                    0f,
+                    -fieldHeight * cellSize / 2f);
+            }
 
             _currentField = new FlowField(fieldWidth, fieldHeight, cellSize, _fieldOrigin);
         }
@@ -80,10 +90,26 @@ namespace KiarcheContinuumWar.Pathfinding
             _obstaclePositions.Clear();
             _obstacleGridPositions.Clear();
 
-            Collider[] colliders = Physics.OverlapSphere(Vector3.zero, obstacleScanRadius, obstacleLayerMask);
+            MapManager mapManager = MapManager.Instance;
+            Vector3 scanCenter = Vector3.zero;
+            Vector3 scanHalfExtents = new Vector3(obstacleScanRadius, 512f, obstacleScanRadius);
+
+            if (mapManager != null)
+            {
+                scanCenter = new Vector3(
+                    mapManager.MapOrigin.x + mapManager.MapWidth * 0.5f,
+                    0f,
+                    mapManager.MapOrigin.z + mapManager.MapHeight * 0.5f);
+                scanHalfExtents = new Vector3(
+                    mapManager.MapWidth * 0.5f + cellSize,
+                    512f,
+                    mapManager.MapHeight * 0.5f + cellSize);
+            }
+
+            Collider[] colliders = Physics.OverlapBox(scanCenter, scanHalfExtents, Quaternion.identity, obstacleLayerMask);
             foreach (Collider collider in colliders)
             {
-                Obstacle obstacle = collider.GetComponent<Obstacle>();
+                Obstacle obstacle = collider.GetComponent<Obstacle>() ?? collider.GetComponentInParent<Obstacle>();
                 if (obstacle == null)
                 {
                     continue;
@@ -112,6 +138,7 @@ namespace KiarcheContinuumWar.Pathfinding
                 InitializeField();
             }
 
+            targetPosition = ClampToMapBounds(targetPosition);
             _currentField.Clear();
             ApplyRegisteredObstacles();
 
@@ -194,7 +221,7 @@ namespace KiarcheContinuumWar.Pathfinding
             Queue<Vector2Int> queue = new Queue<Vector2Int>();
             foreach (Vector3 targetPosition in targetPositions)
             {
-                Vector2Int targetGrid = _currentField.WorldToGrid(targetPosition);
+                Vector2Int targetGrid = _currentField.WorldToGrid(ClampToMapBounds(targetPosition));
                 if (!IsInsideBounds(targetGrid))
                 {
                     continue;
@@ -402,6 +429,19 @@ namespace KiarcheContinuumWar.Pathfinding
         private bool IsInsideBounds(Vector2Int gridPos)
         {
             return gridPos.x >= 0 && gridPos.x < fieldWidth && gridPos.y >= 0 && gridPos.y < fieldHeight;
+        }
+
+        private Vector3 ClampToMapBounds(Vector3 position)
+        {
+            MapManager mapManager = MapManager.Instance;
+            if (mapManager == null)
+            {
+                return position;
+            }
+
+            Vector3 clamped = mapManager.ClampToBounds(position);
+            clamped.y = mapManager.GetTerrainHeight(clamped);
+            return clamped;
         }
 
         private bool IsDiagonalBlocked(Vector2Int current, Vector2Int direction)

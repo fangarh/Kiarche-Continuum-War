@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using KiarcheContinuumWar.Map;
 
 namespace KiarcheContinuumWar.Units
 {
@@ -116,6 +117,13 @@ namespace KiarcheContinuumWar.Units
 
         public void IssueMoveOrder(Vector3 targetPosition)
         {
+            MapManager mapManager = MapManager.Instance;
+            if (mapManager != null)
+            {
+                targetPosition = mapManager.ClampToBounds(targetPosition);
+                targetPosition = mapManager.GetPositionOnTerrain(targetPosition.x, targetPosition.z);
+            }
+
             _targetPosition = targetPosition;
             _targetUnit = null;
 
@@ -188,6 +196,8 @@ namespace KiarcheContinuumWar.Units
                 return;
             }
 
+            MapManager mapManager = MapManager.Instance;
+
             Vector3[] offsets = new Vector3[count];
             Vector3 centroid = Vector3.zero;
 
@@ -204,7 +214,14 @@ namespace KiarcheContinuumWar.Units
             for (int i = 0; i < count; i++)
             {
                 Vector3 centeredOffset = offsets[i] - centroid;
-                availableSlots.Add(targetPosition + centeredOffset);
+                Vector3 slot = targetPosition + centeredOffset;
+                if (mapManager != null)
+                {
+                    slot = mapManager.ClampToBounds(slot);
+                    slot = mapManager.GetPositionOnTerrain(slot.x, slot.z);
+                }
+
+                availableSlots.Add(slot);
             }
 
             List<Unit> remainingUnits = new List<Unit>(_selectedUnits);

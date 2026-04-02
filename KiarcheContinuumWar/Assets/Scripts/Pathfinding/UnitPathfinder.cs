@@ -180,13 +180,13 @@ namespace KiarcheContinuumWar.Units
 
         public void SetTargetPosition(Vector3 position, bool rebuildFlowField)
         {
-            _targetPosition = position;
+            _targetPosition = ClampToTerrain(position);
             _targetUnit = null;
             _hasTarget = false;
             _isMoving = true;
             if (rebuildFlowField)
             {
-                _flowFieldManager?.GenerateFlowField(position);
+                _flowFieldManager?.GenerateFlowField(_targetPosition);
             }
         }
 
@@ -210,7 +210,6 @@ namespace KiarcheContinuumWar.Units
 
         private void Move()
         {
-            float currentY = transform.position.y;
             Vector3 desiredTarget = _hasTarget && _targetUnit != null
                 ? _targetUnit.transform.position
                 : _targetPosition;
@@ -278,7 +277,7 @@ namespace KiarcheContinuumWar.Units
                 transform.position += movement;
             }
 
-            transform.position = new Vector3(transform.position.x, currentY, transform.position.z);
+            transform.position = ClampToTerrain(transform.position);
 
             if (movement.sqrMagnitude > minMoveDistance * minMoveDistance)
             {
@@ -317,7 +316,7 @@ namespace KiarcheContinuumWar.Units
                     continue;
                 }
 
-                Obstacle obstacle = hit.collider.GetComponent<Obstacle>();
+                Obstacle obstacle = hit.collider.GetComponent<Obstacle>() ?? hit.collider.GetComponentInParent<Obstacle>();
                 if (obstacle == null)
                 {
                     continue;
@@ -392,7 +391,20 @@ namespace KiarcheContinuumWar.Units
                 return;
             }
 
-            transform.position = new Vector3(destination.x, transform.position.y, destination.z);
+            transform.position = ClampToTerrain(destination);
+        }
+
+        private Vector3 ClampToTerrain(Vector3 position)
+        {
+            MapManager mapManager = MapManager.Instance;
+            if (mapManager == null)
+            {
+                return position;
+            }
+
+            Vector3 clamped = mapManager.ClampToBounds(position);
+            clamped.y = mapManager.GetTerrainHeight(clamped);
+            return clamped;
         }
 
         private Vector3 CalculateSeparation()

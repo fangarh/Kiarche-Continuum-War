@@ -61,6 +61,12 @@ namespace KiarcheContinuumWar.Map
                 _flowFieldManager = FlowFieldManager.Instance;
             }
 
+            Collider[] childColliders = GetComponentsInChildren<Collider>(true);
+            foreach (Collider childCollider in childColliders)
+            {
+                childCollider.gameObject.layer = gameObject.layer;
+            }
+
             _flowFieldManager?.SetObstacle(transform.position, obstacleRadius);
             _isRegistered = true;
         }
