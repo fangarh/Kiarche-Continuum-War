@@ -216,6 +216,50 @@ export const conceptArts: ConceptArt[] = [
     category: 'characters',
     tags: ['velketh', 'hero', 'apophis', 'warlord', 'era-3-5'],
   },
+
+  // --------------------------------------------------------------------------
+  // Ти'Оны — Герои (5 эпох)
+  // --------------------------------------------------------------------------
+  {
+    id: 'tion-lianna',
+    title: 'Лианна-Первая — Дипломат',
+    description: `Первый Ти'Он, принявший протекторат Кешари. Серебристая кожа, белые robes с зелёной каймой, ранний нейроимплант на висках.`,
+    imageUrl: '/assets/characters/tion/lianna.png',
+    category: 'characters',
+    tags: ['tion', 'hero', 'diplomat', 'protectorate', 'era-1'],
+  },
+  {
+    id: 'tion-voss',
+    title: 'Телепат Восс — Разведчик',
+    description: `Первый Ти'Он с мозговым имплантом Кешари. Зелёные глаза без белков, лёгкая броня разведчика, телепатическое сканирование.`,
+    imageUrl: '/assets/characters/tion/voss.png',
+    category: 'characters',
+    tags: ['tion', 'hero', 'telepath', 'scout', 'era-2'],
+  },
+  {
+    id: 'tion-sel',
+    title: 'Клон-Мастер Сел — Генетик',
+    description: `Создатель программы клонирования Ти'Онов. Белый лабораторный халат с зелёными акцентами, генетические сканеры, колбы клонов.`,
+    imageUrl: '/assets/characters/tion/sel.png',
+    category: 'characters',
+    tags: ['tion', 'hero', 'geneticist', 'cloning', 'era-3'],
+  },
+  {
+    id: 'tion-tir',
+    title: 'Новатор Тир — Изобретатель',
+    description: `Первый герой Ти'Онов без помощи Кешари. Тёмно-зелёный комбинезон инженера, фиолетовый нейроимплант, инновационный процессор.`,
+    imageUrl: '/assets/characters/tion/tir.png',
+    category: 'characters',
+    tags: ['tion', 'hero', 'innovator', 'autonomy', 'era-4'],
+  },
+  {
+    id: 'tion-ori',
+    title: 'Квантовый Ори — Стратег',
+    description: `Первый квантово-усиленный Ти'Он. Голубые схемы по всему телу, голографические кольца вокруг головы, квантовый экзоскелет.`,
+    imageUrl: '/assets/characters/tion/ori.png',
+    category: 'characters',
+    tags: ['tion', 'hero', 'quantum', 'strategist', 'era-5'],
+  },
 ];
 
 // ============================================================================
