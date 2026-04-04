@@ -103,6 +103,12 @@ Desktop.ini
 *.tif
 *.tiff
 
+# Except website public assets
+!documentation/kcwweb/public/assets/**/*.png
+!documentation/kcwweb/public/assets/**/*.jpg
+!documentation/kcwweb/public/assets/**/*.jpeg
+!documentation/kcwweb/public/assets/**/*.gif
+
 # Unity specific
 *.pdb
 *.mdb
