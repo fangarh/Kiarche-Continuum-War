@@ -1,0 +1,235 @@
+{
+  "main": {
+    "id": "ad37d13df3063f64",
+    "type": "split",
+    "children": [
+      {
+        "id": "fd1e842a4e88440a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "89a25b4a9cc3d246",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Играбельные расы/Ти'Оны/Персонажи/Телепат Восс — Промпт.md",
+                "mode": "preview",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Телепат Восс — Промпт"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "3e2f3bfe99fb0e20",
+    "type": "split",
+    "children": [
+      {
+        "id": "0a5a39e765b67997",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "d6b3b872636fe7e7",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "bac9a86f7a616ad4",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "d293d323988c5836",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "f6e1b3262e75e5f8",
+    "type": "split",
+    "children": [
+      {
+        "id": "b556e8bb022acecf",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "3d94f8291d296432",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Глубинный лор/Ки'Архе — Глубинный лор.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for Ки'Архе — Глубинный лор"
+            }
+          },
+          {
+            "id": "55e7709d95717a1f",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Глубинный лор/Ки'Архе — Глубинный лор.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from Ки'Архе — Глубинный лор"
+            }
+          },
+          {
+            "id": "5170041552c6d6a1",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "812f8ff71ff0b28b",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "8826815fb412b8f3",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Глубинный лор/Ки'Архе — Глубинный лор.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of Ки'Архе — Глубинный лор"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "89a25b4a9cc3d246",
+  "lastOpenFiles": [
+    "Играбельные расы/Ти'Оны/Персонажи/Телепат Восс.png",
+    "Играбельные расы/Ти'Оны/Персонажи/Новатор Тир — Промпт.md",
+    "Играбельные расы/Ти'Оны/Персонажи/Новатор Тир.png",
+    "Играбельные расы/Ти'Оны/Персонажи/Лианна-Первая — Промпт.md",
+    "Играбельные расы/Ти'Оны/Персонажи/Лианна-Первая.png",
+    "Играбельные расы/Ти'Оны/Персонажи/Клон-Мастер Сел — Промпт.md",
+    "Играбельные расы/Ти'Оны/Персонажи/Клон-Мастер Сел 2.png",
+    "Играбельные расы/Ти'Оны/Персонажи/Клон-Мастер Сел 1.png",
+    "Играбельные расы/Ти'Оны/Персонажи/Квантовый Ори — Промпт.md",
+    "Играбельные расы/Ти'Оны/Персонажи/Квантовый Ори.png",
+    "00 Карта соответствий.md",
+    "Играбельные расы/Ти'Оны/Персонажи/Телепат Восс — Промпт.md",
+    "Играбельные расы/Ти'Оны/Персонажи/Квантовый Ори.md",
+    "Играбельные расы/Ти'Оны/Персонажи/Новатор Тир.md",
+    "Играбельные расы/Ти'Оны/Персонажи/Клон-Мастер Сел.md",
+    "Играбельные расы/Ти'Оны/Персонажи/Телепат Восс.md",
+    "Играбельные расы/Ти'Оны/Персонажи/Лианна-Первая.md",
+    "Играбельные расы/Ти'Оны/Персонажи",
+    "Неиграбельные расы/Вел'Кеты/Персонажи/Ра Кен.md",
+    "Неиграбельные расы/Вел'Кеты/Персонажи/Ра Кен — Промпт.md",
+    "Неиграбельные расы/Вел'Кеты/Персонажи/Ра Кен.png",
+    "Неиграбельные расы/Вел'Кеты/Персонажи/Первый Владыка — Промпт.md",
+    "Неиграбельные расы/Вел'Кеты/Персонажи/Первый Владыка.png",
+    "Играбельные расы/Родверы/Персонажи/Первый Владыка.png",
+    "Неиграбельные расы/Вел'Кеты/Персонажи/Зул'Кен — Промпт.md",
+    "Неиграбельные расы/Вел'Кеты/Персонажи/Зул'Кен.jpg",
+    "Неиграбельные расы/Вел'Кеты/Персонажи/Апофис — Промпт.md",
+    "Неиграбельные расы/Вел'Кеты/Персонажи/Апофис.jpg",
+    "Играбельные расы/Тал'Син/Персонажи/Эк'Туар.md",
+    "Играбельные расы/Тал'Син/Персонажи/Силесия К-'Тор.md",
+    "Играбельные расы/Ре'Зиры/Персонажи/Посол Кешари.md",
+    "Играбельные расы/Ре'Зиры/Персонажи/Мира-Разорванная.md",
+    "Играбельные расы/Ре'Зиры/Персонажи/Посланник Ра Кена.md",
+    "Играбельные расы/Ре'Зиры/Персонажи/К'Зар.md",
+    "Играбельные расы/Ре'Зиры/Персонажи/Инспектор Вел'Кетов.md",
+    "Играбельные расы/Ре'Зиры/Персонажи/Зара-Двуликая.md",
+    "Играбельные расы/Ре'Зиры/Персонажи/Жрец Зул'Тар.md",
+    "Играбельные расы/Родверы/Персонажи",
+    "Играбельные расы/Ре'Зиры/Персонажи",
+    "Играбельные расы/Родверы/Эпохи",
+    "Играбельные расы/Ве'Ори/Эпохи",
+    "Играбельные расы/Ти'Оны/Эпохи",
+    "Играбельные расы/Тал'Син/Этапы",
+    "Играбельные расы/Ре'Зиры/Эпохи",
+    "Неиграбельные расы/Вел'Кеты/Персонажи",
+    "Неиграбельные расы/Вел'Кеты"
+  ]
+}

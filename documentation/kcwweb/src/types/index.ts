@@ -148,6 +148,12 @@ export interface UXPrinciple {
 // ----------------------------------------------------------------------------
 // Механики молодых рас
 // ----------------------------------------------------------------------------
+export interface EraInfo {
+  name: string;
+  tech: string;
+  key: string;
+}
+
 export interface YoungRaceMechanic {
   id: string;
   name: string;
@@ -155,6 +161,7 @@ export interface YoungRaceMechanic {
   mechanics: string[];
   techTree: string;
   victoryCondition: string;
+  eras?: EraInfo[];
 }
 
 export interface YoungRacesSystem {

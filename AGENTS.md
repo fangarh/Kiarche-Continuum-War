@@ -1,46 +1,69 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-`KiarcheContinuumWar/` contains the Unity 6 game project. Core gameplay code lives under `Assets/Scripts/` and is split by domain: `Units/`, `Pathfinding/`, `Map/`, `Pooling/`, `Managers/`, `UI/`, and editor automation in `Editor/`. Main scenes are in `Assets/Scenes/`, prefabs in `Assets/Prefabs/`, and project-wide settings in `ProjectSettings/`.
+This repo contains **two projects**:
 
-`documentation/` stores design notes, lore, and devlogs. `documentation/kcwweb/` is a separate React + TypeScript + Vite app for project docs, with source in `src/`, static assets in `public/`, and page data in `src/data/`.
+**Unity 6 Game** — `KiarcheContinuumWar/`
+- Core gameplay code: `Assets/Scripts/` split by domain: `Units/`, `Pathfinding/`, `Map/`, `Pooling/`, `Managers/`, `UI/`, `CameraSystem/`, `InputSystem/`, `Core/`, and editor automation in `Editor/`.
+- Scenes: `Assets/Scenes/` (primary: `MVP_Prototype.unity`, `TestMap.unity`). Prefabs: `Assets/Prefabs/`. Settings: `ProjectSettings/`.
+- No `.asmdef` files — relies on default Unity assembly compilation.
+
+**React Docs Web App** — `documentation/kcwweb/`
+- React 19 + TypeScript 5.9 + Vite 8 + React Router 7 SPA.
+- Source: `src/` with `components/`, `pages/`, `data/`, `types/`, `styles/`, `hooks/`.
+- Data-driven: all content lives in typed `src/data/` files, never hardcoded in components.
+- Path aliases: `@/`, `@components/`, `@pages/`, `@data/`, `@types/`, `@hooks/`, `@styles/`.
 
 ## Build, Test, and Development Commands
-Unity uses editor workflows rather than a CLI build script in this repo.
 
+### Unity (editor workflows)
 - Open `KiarcheContinuumWar/` in Unity `6000.4.0f1`.
-- Run the prototype by opening `Assets/Scenes/MVP_Prototype.unity` and pressing Play.
-- Use `Tools > KCW > Generate MVP Scene` or `Generate Test Map` to rebuild editor-generated content.
+- Play `Assets/Scenes/MVP_Prototype.unity` to test.
+- Debug shortcuts: `T` (toggle), `P` (pathfinding), `R` (reset) — see `Assets/Scripts/README.md`.
+- Editor tools: `Tools > KCW > Generate MVP Scene` or `Generate Test Map`.
 
-For the docs app, run from `documentation/kcwweb/`:
+### Docs Web App (run from `documentation/kcwweb/`)
+```bash
+npm install          # Install dependencies
+npm run dev          # Start Vite dev server (HMR)
+npm run build        # TypeScript check + production bundle (tsc -b && vite build)
+npm run lint         # Run ESLint (eslint .)
+npm run preview      # Serve production build locally
+```
+Treat `npm run build` and `npm run lint` as the minimum verification before opening a PR. There is no automated test suite — `npm run build` serves as the type-check gate.
 
-- `npm install` installs dependencies.
-- `npm run dev` starts the Vite dev server.
-- `npm run build` runs TypeScript build checks and produces a production bundle.
-- `npm run lint` runs ESLint.
-- `npm run preview` serves the built site locally.
+## Coding Style & Conventions
 
-## Coding Style & Naming Conventions
-C# uses 4-space indentation, PascalCase for public types/members, camelCase for serialized private fields, and leading underscores for private runtime fields such as `_pathfinder`. Keep namespaces under `KiarcheContinuumWar.*` and place scripts in the matching feature folder.
+### C# (Unity)
+- 4-space indentation. No `.editorconfig` — follow existing files.
+- **Naming**: PascalCase for public types/members, camelCase for serialized private fields, `_camelCase` with leading underscore for private runtime fields (e.g., `_pathfinder`).
+- **Namespaces**: `KiarcheContinuumWar.*` matching feature folder.
+- **Organization**: One class per file, file name matches class name. Place scripts in matching domain folder.
+- **Unity patterns**: Use `[SerializeField] private` for inspector-exposed fields. Keep `[RequireComponent]` and `[DisallowMultipleComponent]` where applicable.
+- **Error handling**: Use `Debug.LogError` / `Debug.LogWarning` for runtime issues. Guard null references early with `if (x == null) return`.
 
-TypeScript/React files also use 4-space indentation in practice, PascalCase component names, and colocated `.css` files such as `Home.tsx` and `Home.css`.
+### TypeScript/React
+- 4-space indentation. Strict TypeScript: `noUnusedLocals`, `noUnusedParameters`, `erasableSyntaxOnly`, `noFallthroughCasesInSwitch`.
+- **Naming**: PascalCase for components and types (`HomePage`, `UnitData`), camelCase for variables/functions, `camelCase.ts` for data files.
+- **Components**: Named exports (`export function HomePage`). Each page has a co-located `.css` file.
+- **Imports**: Use path aliases (`@components/`, `@data/`, etc.) — never relative `../../` chains across directories.
+- **CSS**: Co-located `.css` files per page/component. Use CSS variables for theming (dark theme, purple accents, mobile-first responsive).
+- **Data**: All content in `src/data/` typed via `src/types/index.ts`. Components consume data, never embed it.
+- **Error handling**: Use React error boundaries where appropriate. Log with `console.error` for unexpected states.
 
 ## Testing Guidelines
-There is no automated test suite checked in yet. Validate gameplay changes in Unity by exercising `MVP_Prototype.unity` and `TestMap.unity`, including the existing debug shortcuts (`T`, `P`, `R`) documented in `Assets/Scripts/README.md`. For the docs app, treat `npm run build` and `npm run lint` as the minimum verification before opening a PR.
+No automated test suite exists. Validate changes manually:
+- **Unity**: Playtest in `MVP_Prototype.unity` and `TestMap.unity`. Use debug shortcuts.
+- **Web App**: Run `npm run build` (type checks) and `npm run lint` before committing. Visually verify pages via `npm run dev`.
 
 ## Agent Instructions
-For this repository, always use Context7 for Unity questions before answering from memory. This applies to Unity API usage, editor workflows, package setup, lifecycle methods, Input System, URP, and version-specific behavior.
-
-Use this sequence:
-- `resolve-library-id` with `Unity` and the user's full question
-- prefer `/websites/unity_en-us` for general Unity docs, or a more specific Unity package ID when clearly relevant
-- `query-docs` with the full user question, then answer from the returned documentation
+- **Always use Context7 for Unity questions** before answering from memory. This applies to Unity API usage, editor workflows, package setup, lifecycle methods, Input System, URP, and version-specific behavior.
+  1. `resolve-library-id` with `Unity` and the user's full question
+  2. Prefer `/websites/unity_en-us` for general docs, or a specific Unity package ID
+  3. `query-docs` with the full question, then answer from returned documentation
+- **Language**: Respond in Russian (per `documentation/memory/user_language.md`).
 
 ## Commit & Pull Request Guidelines
-Recent history mixes short English and Russian subjects, but the useful pattern is imperative, scope-first summaries such as `Add movement` or `Fix menu layout`. Avoid placeholder subjects like `123`.
-
-PRs should include:
-- a short description of the gameplay, tooling, or docs change
-- linked issue or task ID when available
-- screenshots or short clips for scene, UI, or docs-page changes
-- note of how the change was verified (`Unity playtest`, `npm run build`, `npm run lint`)
+- **Commits**: Imperative, scope-first subjects (e.g., `Add movement`, `Fix menu layout`). Avoid placeholders like `123`.
+- **Branches**: `feature/*`, `fix/*`, `docs/*`.
+- **PRs must include**: short description of the change, linked issue/task ID when available, screenshots/clips for scene/UI/docs-page changes, and verification method (`Unity playtest`, `npm run build`, `npm run lint`).

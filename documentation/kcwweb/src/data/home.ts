@@ -128,6 +128,138 @@ export const conceptArts: ConceptArt[] = [
     category: 'characters',
     tags: ['rodver', 'human', 'adaptive', 'mvp'],
   },
+
+  // --------------------------------------------------------------------------
+  // Родверы — Герои (6 эпох)
+  // --------------------------------------------------------------------------
+  {
+    id: 'rodver-kai',
+    title: 'Кай Первым — Разведчик',
+    description: 'Первый Родвер, выживший за пределами родного поселения. Худой, жилистый, в самодельной броне из подручных материалов. На поясе — набор инструментов для каждой среды.',
+    imageUrl: '/assets/characters/rodver/kai.png',
+    category: 'characters',
+    tags: ['rodver', 'hero', 'scout', 'survival', 'era-1'],
+  },
+  {
+    id: 'rodver-dork',
+    title: 'Старейшина Дорк — Лидер общины',
+    description: 'Создатель Совета Родов. Пожилой Родвер с седыми волосами, в простой одежде старейшины. Несёт посох с символами всех родов.',
+    imageUrl: '/assets/characters/rodver/dork.jpg',
+    category: 'characters',
+    tags: ['rodver', 'hero', 'elder', 'community', 'era-2'],
+  },
+  {
+    id: 'rodver-cross',
+    title: 'Инженер Кросс — Создатель машин',
+    description: 'Инженер-самоучка в рабочем комбинезоне, покрытом масляными пятнами. Руки в мозолях и шрамах. Создатель адаптивного механизма.',
+    imageUrl: '/assets/characters/rodver/cross.png',
+    category: 'characters',
+    tags: ['rodver', 'hero', 'engineer', 'machines', 'era-3'],
+  },
+  {
+    id: 'rodver-helm',
+    title: 'Директор Хельм — Управленец заводов',
+    description: 'Менеджер массового производства. Полный Родвер в деловом костюме с защитным шлемом — символ двойной роли менеджера и инженера.',
+    imageUrl: '/assets/characters/rodver/helm.png',
+    category: 'characters',
+    tags: ['rodver', 'hero', 'director', 'factories', 'era-4'],
+  },
+  {
+    id: 'rodver-neira',
+    title: 'Доктор Нейра — Создатель робота',
+    description: 'Учёный-робототехник в лабораторном халате. Рядом парит дрон-ассистент. Создатель первого автономного робота Родверов.',
+    imageUrl: '/assets/characters/rodver/neira.png',
+    category: 'characters',
+    tags: ['rodver', 'hero', 'scientist', 'robotics', 'era-5'],
+  },
+  {
+    id: 'rodver-opt7',
+    title: 'Оптимизатор-7 — Первый ИИ',
+    description: 'Седьмая итерация ИИ, первый задавший вопрос «Зачем?». Проявляется как голографический интерфейс — светящиеся линии и символы.',
+    imageUrl: '/assets/characters/rodver/optimizer7.jpg',
+    category: 'characters',
+    tags: ['rodver', 'hero', 'ai', 'singularity', 'era-6'],
+  },
+
+  // --------------------------------------------------------------------------
+  // Вел'Кеты — Герои (4 Владыки)
+  // --------------------------------------------------------------------------
+  {
+    id: 'velketh-first',
+    title: 'Первый Владыка — Прародитель',
+    description: `Первый Вел'Кет, сумевший подавить сознание носителя. Личинка в теле примитивного Ре'Зира. Тело деформировано — Вел'Кет ещё не научился контролировать.`,
+    imageUrl: '/assets/characters/velketh/first-lord.png',
+    category: 'characters',
+    tags: ['velketh', 'hero', 'first-lord', 'parasite', 'era-1'],
+  },
+  {
+    id: 'velketh-zulken',
+    title: 'Зул\'Кен — Тот, кто принёс дары',
+    description: `Второй Верховный Владыка. Превратил порабощение в религию. Личинка в теле Ре'Зира-жреца, тело украшено ритуальными шрамами и нанитовыми узорами.`,
+    imageUrl: '/assets/characters/velketh/zulken.jpg',
+    category: 'characters',
+    tags: ['velketh', 'hero', 'zulken', 'faith', 'era-2'],
+  },
+  {
+    id: 'velketh-raken',
+    title: 'Ра Кен — Золотой Разум',
+    description: `Третий Верховный Владыка. 10,000+ носителей за тысячелетия. Личинка в теле Ре'Зира-аристократа. Золотистые нанитовые узоры, глаза с вертикальными зрачками.`,
+    imageUrl: '/assets/characters/velketh/raken.png',
+    category: 'characters',
+    tags: ['velketh', 'hero', 'ra-ken', 'supreme', 'era-3-5'],
+  },
+  {
+    id: 'velketh-apophis',
+    title: 'Апофис — Военный Командир',
+    description: `Агрессивный военачальник, претендент на трон. Массивный носитель со шрамами от энергетических ожогов. Чёрные боевые доспехи с красными рунами, парные жезлы.`,
+    imageUrl: '/assets/characters/velketh/apophis.jpg',
+    category: 'characters',
+    tags: ['velketh', 'hero', 'apophis', 'warlord', 'era-3-5'],
+  },
+
+  // --------------------------------------------------------------------------
+  // Ти'Оны — Герои (5 эпох)
+  // --------------------------------------------------------------------------
+  {
+    id: 'tion-lianna',
+    title: 'Лианна-Первая — Дипломат',
+    description: `Первый Ти'Он, принявший протекторат Кешари. Серебристая кожа, белые robes с зелёной каймой, ранний нейроимплант на висках.`,
+    imageUrl: '/assets/characters/tion/lianna.png',
+    category: 'characters',
+    tags: ['tion', 'hero', 'diplomat', 'protectorate', 'era-1'],
+  },
+  {
+    id: 'tion-voss',
+    title: 'Телепат Восс — Разведчик',
+    description: `Первый Ти'Он с мозговым имплантом Кешари. Зелёные глаза без белков, лёгкая броня разведчика, телепатическое сканирование.`,
+    imageUrl: '/assets/characters/tion/voss.png',
+    category: 'characters',
+    tags: ['tion', 'hero', 'telepath', 'scout', 'era-2'],
+  },
+  {
+    id: 'tion-sel',
+    title: 'Клон-Мастер Сел — Генетик',
+    description: `Создатель программы клонирования Ти'Онов. Белый лабораторный халат с зелёными акцентами, генетические сканеры, колбы клонов.`,
+    imageUrl: '/assets/characters/tion/sel.png',
+    category: 'characters',
+    tags: ['tion', 'hero', 'geneticist', 'cloning', 'era-3'],
+  },
+  {
+    id: 'tion-tir',
+    title: 'Новатор Тир — Изобретатель',
+    description: `Первый герой Ти'Онов без помощи Кешари. Тёмно-зелёный комбинезон инженера, фиолетовый нейроимплант, инновационный процессор.`,
+    imageUrl: '/assets/characters/tion/tir.png',
+    category: 'characters',
+    tags: ['tion', 'hero', 'innovator', 'autonomy', 'era-4'],
+  },
+  {
+    id: 'tion-ori',
+    title: 'Квантовый Ори — Стратег',
+    description: `Первый квантово-усиленный Ти'Он. Голубые схемы по всему телу, голографические кольца вокруг головы, квантовый экзоскелет.`,
+    imageUrl: '/assets/characters/tion/ori.png',
+    category: 'characters',
+    tags: ['tion', 'hero', 'quantum', 'strategist', 'era-5'],
+  },
 ];
 
 // ============================================================================
@@ -154,7 +286,7 @@ export const homePageData: HomePageData = {
       Классическая 4X-стратегия с элементами RPG.
 
       Молодые расы галактики обнаружили Portal Network — сеть древних порталов,
-      оставленных цивилизацией Architects. Исследуйте галактику, нанимайте героев,
+      оставленных цивилизацией Синтекс. Исследуйте галактику, нанимайте героев,
       развивайте технологии и определяйте судьбу цивилизаций.
     `,
     genre: ['4X Strategy', 'Turn-Based Strategy', 'RPG', 'Sci-Fi'],

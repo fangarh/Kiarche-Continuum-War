@@ -200,7 +200,7 @@ export const roadmapData: RoadmapData = {
             { id: 'task-037', title: 'Ветка военных технологий — оружие и броня', completed: false },
             { id: 'task-038', title: 'Ветка производства — здания и ресурсы', completed: false },
             { id: 'task-039', title: 'Ветка исследования — скорость и эффективность', completed: false },
-            { id: 'task-040', title: 'Ветка Architects — древние технологии', completed: false },
+            { id: 'task-040', title: 'Ветка Синтекс — древние технологии', completed: false },
             { id: 'task-041', title: 'Визуализация древа — интерактивное UI', completed: false },
             { id: 'task-042', title: 'Предметы из технологий — юниты и здания', completed: false },
           ],
