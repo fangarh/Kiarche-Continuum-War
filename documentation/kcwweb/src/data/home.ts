@@ -260,6 +260,66 @@ export const conceptArts: ConceptArt[] = [
     category: 'characters',
     tags: ['tion', 'hero', 'quantum', 'strategist', 'era-5'],
   },
+
+  // --------------------------------------------------------------------------
+  // Ве'Ори — Герои Фен'Ри (7 наставников)
+  // --------------------------------------------------------------------------
+  {
+    id: 'veori-ana',
+    title: 'Ана Нокси — Хранительница Гармонии',
+    description: `Лидер Сил'Ни, наставница Ве'Ори и Фен'Ри. Высокий гуманоид со светлой кожей и мягким зелёным свечением.`,
+    imageUrl: '/assets/characters/veori/ana-noxi.png',
+    category: 'characters',
+    tags: ['veori', 'sylni', 'mentor', 'healer'],
+  },
+  {
+    id: 'veori-rensha',
+    title: 'Рен\'Ша — Лиса-разведчик',
+    description: `Антропоморфная лиса Фен'Ри. Рыжая шерсть, янтарные глаза, зелёные телепатические усилители на ушах.`,
+    imageUrl: '/assets/characters/veori/rensha.jpeg',
+    category: 'characters',
+    tags: ['veori', 'fenri', 'fox', 'scout'],
+  },
+  {
+    id: 'veori-karra',
+    title: 'Ка\'Рра — Пантера-защитник',
+    description: `Антропоморфная пантера Фен'Ри. Чёрная шерсть с синим отливом, зелёные глаза в темноте.`,
+    imageUrl: '/assets/characters/veori/karra.png',
+    category: 'characters',
+    tags: ['veori', 'fenri', 'panther', 'guardian'],
+  },
+  {
+    id: 'veori-torgun',
+    title: 'Тор\'Гун — Медведь-щит',
+    description: `Антропоморфный медведь Фен'Ри. Коричневая шерсть с серебром, шрамы от битв, символ Сил'Ни на груди.`,
+    imageUrl: '/assets/characters/veori/torgun.jpeg',
+    category: 'characters',
+    tags: ['veori', 'fenri', 'bear', 'shield'],
+  },
+  {
+    id: 'veori-eldor',
+    title: 'Эл\'Дор — Олень-целитель',
+    description: `Антропоморфный олень Фен'Ри. Золотисто-коричневая шерсть, ветвистые рога с зелёным свечением.`,
+    imageUrl: '/assets/characters/veori/eldor.jpeg',
+    category: 'characters',
+    tags: ['veori', 'fenri', 'stag', 'healer'],
+  },
+  {
+    id: 'veori-shira',
+    title: 'Ши\'Ра — Сова-провидец',
+    description: `Антропоморфная сова Фен'Ри. Серо-белые перья, жёлтые глаза, мантия со звёздным паттерном.`,
+    imageUrl: '/assets/characters/veori/shira.jpeg',
+    category: 'characters',
+    tags: ['veori', 'fenri', 'owl', 'seer'],
+  },
+  {
+    id: 'veori-piplok',
+    title: 'Пип\'Лок — Заяц-биоинженер',
+    description: `Антропоморфный заяц Фен'Ри. Серо-коричневая шерсть, зелёные узелки на ушах, жилет с карманами.`,
+    imageUrl: '/assets/characters/veori/piplok.jpeg',
+    category: 'characters',
+    tags: ['veori', 'fenri', 'hare', 'bioengineer'],
+  },
 ];
 
 // ============================================================================
