@@ -25,42 +25,42 @@ export const loreData: LoreData = {
     {
       name: 'Терра Прайм',
       description: 'Родной мир человечества. Умеренный климат, океаны, континенты. До открытия порталов — изолированная цивилизация с ядерными технологиями. После — точка контакта с галактическим сообществом.',
-      imageUrl: '/assets/worlds/terra-prime.jpg',
+      imageUrl: '/assets/lore/worlds/terra-nova.png',
     },
     {
       name: 'К\'Тана',
       description: 'Пустынная планета с древними руинами Синтекс. Кристаллические formations, содержащие записи древних. Опасна для неподготовленных — радиация и активированные защитные системы.',
-      imageUrl: '/assets/worlds/k-tana.jpg',
+      imageUrl: '/assets/lore/worlds/nexus-prime.png',
     },
     {
       name: 'Велур',
       description: "Мир органических структур — гигантские мембраны, формирующие атмосферу и экосистему одновременно. Колонизирован Тал'Син как перевалочная база. Сил'Ни также присутствуют, соблюдая нейтралитет.",
-      imageUrl: '/assets/worlds/velur.jpg',
+      imageUrl: '/assets/lore/worlds/aeris.png',
     },
     {
       name: 'Синт\'Ара',
       description: 'Крепость Тал\'Син. Планета с инвертированной гравитацией — ядро на поверхности, кора внутри. Здесь находятся древние резонансные якоря — точки переноса Ки\'Архе.',
-      imageUrl: '/assets/worlds/sint-ara.jpg',
+      imageUrl: '/assets/lore/worlds/shadow-sector.png',
     },
     {
       name: 'Разлом',
       description: 'Область пространства, где Rift вплотную приближается к материальной вселенной. Искажения времени и гравитации. Здесь обнаружены следы Первого Контакта — артефакты невообразимой древности.',
-      imageUrl: '/assets/worlds/rift-zone.jpg',
+      imageUrl: '/assets/lore/worlds/terra-nova.png',
     },
     {
       name: 'Т\'Кир',
       description: 'Родная планета Кешари. Высокотехнологичный мир-кузня, где разрабатываются защитные системы для всей галактики. Торговый центр — сюда стекаются ресурсы и информация.',
-      imageUrl: '/assets/worlds/t-kir.jpg',
+      imageUrl: '/assets/lore/worlds/nexus-prime.png',
     },
     {
       name: 'Гоа\'ол',
       description: 'Горячая планета с вулканической активностью. Цитадель Вел\'Кетов. Здесь они разрабатывают паразитические технологии и готовят вторжения в мирные системы.',
-      imageUrl: '/assets/worlds/goaol.jpg',
+      imageUrl: '/assets/lore/worlds/aeris.png',
     },
     {
       name: 'Асгард Протекторат',
       description: 'Сектор пространства под защитой Кешари. Сюда входят 12 колонизированных миров молодых рас. Нейтральная зона с действующим военным альянсом.',
-      imageUrl: '/assets/worlds/asgard-protectorate.jpg',
+      imageUrl: '/assets/lore/worlds/shadow-sector.png',
     },
   ],
 
