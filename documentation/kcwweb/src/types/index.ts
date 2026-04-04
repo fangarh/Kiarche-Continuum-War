@@ -17,7 +17,7 @@ export interface ConceptArt {
   id: string;
   title: string;
   description: string;
-  imageUrl: string;
+  imageUrl?: string;
   category: ConceptArtCategory;
   tags: string[];
 }

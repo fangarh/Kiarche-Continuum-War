@@ -98,12 +98,18 @@ export function Gallery({ items, title, filterByCategory }: GalleryProps) {
             onClick={() => handleImageClick(item)}
           >
             <div className="gallery-image-wrapper">
-              <img
-                src={item.imageUrl}
-                alt={item.title}
-                className="gallery-image"
-                loading="lazy"
-              />
+              {item.imageUrl ? (
+                <img
+                  src={item.imageUrl}
+                  alt={item.title}
+                  className="gallery-image"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="gallery-image-placeholder">
+                  <span>🎨</span>
+                </div>
+              )}
               <div className="gallery-overlay">
                 <span className="gallery-overlay-text">Просмотреть</span>
               </div>
