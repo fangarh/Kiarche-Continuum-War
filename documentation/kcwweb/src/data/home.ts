@@ -266,7 +266,8 @@ export const conceptArts: ConceptArt[] = [
   {
     id: 'veori-ana',
     title: 'Ана Нокси — Хранительница Гармонии',
-    description: `Лидер Сил'Ни, наставница Ве'Ори и Фен'Ри. Высокий гуманоид со светлой кожей и мягким зелёным свечением.`,
+    description: `Лидер Сил'Ни, наставница Ве'Ори и Фен'Ри. Высокий гуманоид со светлой кожей и мягким зелёным свечением. Длинные белые волосы, золотисто-янтарные глаза, живая ткань одежды.`,
+    imageUrl: '/assets/characters/veori/ana-noxi.jpg',
     category: 'characters',
     tags: ['veori', 'sylni', 'mentor', 'healer'],
   },
