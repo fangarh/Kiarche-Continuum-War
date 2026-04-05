@@ -273,7 +273,7 @@ export const conceptArts: ConceptArt[] = [
   {
     id: 'veori-rensha',
     title: 'Рен\'Ша — Лиса-разведчик',
-    description: `Антропоморфная лиса Фен'Ри. Рыжая шерсть, янтарные глаза, зелёные телепатические усилители на ушах.`,
+    description: `Антропоморфная лиса Фен'Ри. Рыжая шерсть с белыми отметинами, янтарные глаза, пушистый хвост. Телепатические усилители на ушах светятся зелёным. Выросла на границах Зар'Кай — научилась скрываться раньше, чем говорить.`,
     imageUrl: '/assets/characters/veori/rensha.jpeg',
     category: 'characters',
     tags: ['veori', 'fenri', 'fox', 'scout'],
@@ -281,7 +281,7 @@ export const conceptArts: ConceptArt[] = [
   {
     id: 'veori-karra',
     title: 'Ка\'Рра — Пантера-защитник',
-    description: `Антропоморфная пантера Фен'Ри. Чёрная шерсть с синим отливом, зелёные глаза в темноте.`,
+    description: `Антропоморфная пантера Фен'Ри. Чёрная шерсть с синим отливом, зелёные светящиеся глаза. Мускулистое телосложение, плавные бесшумные движения. В одиночку задержал отряд Вел'Кетов на 3 дня.`,
     imageUrl: '/assets/characters/veori/karra.png',
     category: 'characters',
     tags: ['veori', 'fenri', 'panther', 'guardian'],
@@ -289,7 +289,7 @@ export const conceptArts: ConceptArt[] = [
   {
     id: 'veori-torgun',
     title: 'Тор\'Гун — Медведь-щит',
-    description: `Антропоморфный медведь Фен'Ри. Коричневая шерсть с серебром, шрамы от битв, символ Сил'Ни на груди.`,
+    description: `Антропоморфный медведь Фен'Ри. Коричневая шерсть с серебристыми вкраплениями, шрамы от энергетических ожогов. Символ Сил'Ни на груди — круг с ростком. За 500 лет не отступил ни разу.`,
     imageUrl: '/assets/characters/veori/torgun.jpeg',
     category: 'characters',
     tags: ['veori', 'fenri', 'bear', 'shield'],
@@ -297,7 +297,7 @@ export const conceptArts: ConceptArt[] = [
   {
     id: 'veori-eldor',
     title: 'Эл\'Дор — Олень-целитель',
-    description: `Антропоморфный олень Фен'Ри. Золотисто-коричневая шерсть, ветвистые рога с зелёным свечением.`,
+    description: `Антропоморфный олень Фен'Ри. Золотисто-коричневая шерсть, величественные рога с зелёным свечением на кончиках. Белые flowing robes с зелёными узорами. Потомок старейшин Циркл-Поляны.`,
     imageUrl: '/assets/characters/veori/eldor.jpeg',
     category: 'characters',
     tags: ['veori', 'fenri', 'stag', 'healer'],
@@ -305,7 +305,7 @@ export const conceptArts: ConceptArt[] = [
   {
     id: 'veori-shira',
     title: 'Ши\'Ра — Сова-провидец',
-    description: `Антропоморфная сова Фен'Ри. Серо-белые перья, жёлтые глаза, мантия со звёздным паттерном.`,
+    description: `Антропоморфная сова Фен'Ри. Серо-белые перья с тёмными полосами, жёлтые светящиеся глаза. Серо-голубая мантия со звёздным паттерном, кристаллический узел на груди. Единственный Фен'Ри с телепатией на расстоянии.`,
     imageUrl: '/assets/characters/veori/shira.jpeg',
     category: 'characters',
     tags: ['veori', 'fenri', 'owl', 'seer'],
@@ -313,7 +313,7 @@ export const conceptArts: ConceptArt[] = [
   {
     id: 'veori-piplok',
     title: 'Пип\'Лок — Заяц-биоинженер',
-    description: `Антропоморфный заяц Фен'Ри. Серо-коричневая шерсть, зелёные узелки на ушах, жилет с карманами.`,
+    description: `Антропоморфный заяц Фен'Ри. Серо-коричневая шерсть, зелёные телепатические узелки на длинных ушах. Практичный жилет с карманами для семян и био-инструментов. Самый маленький герой, но незаменимый.`,
     imageUrl: '/assets/characters/veori/piplok.jpeg',
     category: 'characters',
     tags: ['veori', 'fenri', 'hare', 'bioengineer'],
