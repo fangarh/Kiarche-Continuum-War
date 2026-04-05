@@ -1,5 +1,8 @@
 ﻿---
 title: "Создание Portal Network"
+aliases:
+  - Создание Сети
+  - Portal Network Creation
 era: "Эра Архитекторов"
 year: "Древность"
 tags:
