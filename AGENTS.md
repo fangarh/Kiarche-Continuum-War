@@ -5,14 +5,15 @@ This repo contains **two projects**:
 
 **Unity 6 Game** — `KiarcheContinuumWar/`
 - Core gameplay code: `Assets/Scripts/` split by domain: `Units/`, `Pathfinding/`, `Map/`, `Pooling/`, `Managers/`, `UI/`, `CameraSystem/`, `InputSystem/`, `Core/`, and editor automation in `Editor/`.
-- Scenes: `Assets/Scenes/` (primary: `MVP_Prototype.unity`, `TestMap.unity`). Prefabs: `Assets/Prefabs/`. Settings: `ProjectSettings/`.
+- Scenes: `Assets/Scenes/` (main working scenes: `MVP_Prototype.unity`, `TestMap.unity`; auxiliary: `SampleScene.unity`). Prefabs: `Assets/Prefabs/`. Settings: `ProjectSettings/`.
 - No `.asmdef` files — relies on default Unity assembly compilation.
 
 **React Docs Web App** — `documentation/kcwweb/`
 - React 19 + TypeScript 5.9 + Vite 8 + React Router 7 SPA.
-- Source: `src/` with `components/`, `pages/`, `data/`, `types/`, `styles/`, `hooks/`.
+- Source: `src/` with `components/`, `pages/`, `data/`, `types/`, `styles/`. Path aliases also reserve `src/hooks/`, but that directory may be absent until needed.
 - Data-driven: all content lives in typed `src/data/` files, never hardcoded in components.
 - Path aliases: `@/`, `@components/`, `@pages/`, `@data/`, `@types/`, `@hooks/`, `@styles/`.
+- Markdown docs rendering uses `react-markdown` + `remark-gfm`; keep markdown content/config data-driven rather than embedding large static HTML in components.
 
 ## Build, Test, and Development Commands
 
@@ -20,7 +21,7 @@ This repo contains **two projects**:
 - Open `KiarcheContinuumWar/` in Unity `6000.4.0f1`.
 - Play `Assets/Scenes/MVP_Prototype.unity` to test.
 - Debug shortcuts: `T` (toggle), `P` (pathfinding), `R` (reset) — see `Assets/Scripts/README.md`.
-- Editor tools: `Tools > KCW > Generate MVP Scene` or `Generate Test Map`.
+- Editor tools: `Tools > KCW > Create Unit Prefab`, `Generate MVP Scene`, `Generate Test Map`.
 
 ### Docs Web App (run from `documentation/kcwweb/`)
 ```bash
@@ -47,8 +48,10 @@ Treat `npm run build` and `npm run lint` as the minimum verification before open
 - **Naming**: PascalCase for components and types (`HomePage`, `UnitData`), camelCase for variables/functions, `camelCase.ts` for data files.
 - **Components**: Named exports (`export function HomePage`). Each page has a co-located `.css` file.
 - **Imports**: Use path aliases (`@components/`, `@data/`, etc.) — never relative `../../` chains across directories.
+- **Aliases**: Keep `vite.config.ts` and `tsconfig.app.json` path aliases synchronized when adding, renaming, or removing aliases/directories.
 - **CSS**: Co-located `.css` files per page/component. Use CSS variables for theming (dark theme, purple accents, mobile-first responsive).
 - **Data**: All content in `src/data/` typed via `src/types/index.ts`. Components consume data, never embed it.
+- **React toolchain**: Preserve the existing React Compiler setup (`@vitejs/plugin-react` plus `@rolldown/plugin-babel` with `reactCompilerPreset`) unless the task explicitly requires changing build tooling.
 - **Error handling**: Use React error boundaries where appropriate. Log with `console.error` for unexpected states.
 
 ## Testing Guidelines
@@ -61,6 +64,7 @@ No automated test suite exists. Validate changes manually:
   1. `resolve-library-id` with `Unity` and the user's full question
   2. Prefer `/websites/unity_en-us` for general docs, or a specific Unity package ID
   3. `query-docs` with the full question, then answer from returned documentation
+- **Also use Context7 for web stack/library questions** in this repo: React, Vite, React Router, TypeScript, ESLint, `react-markdown`, and related tooling.
 - **Language**: Respond in Russian (per `documentation/memory/user_language.md`).
 
 ## Commit & Pull Request Guidelines
