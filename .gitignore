@@ -109,6 +109,12 @@ Desktop.ini
 !documentation/kcwweb/public/assets/**/*.jpeg
 !documentation/kcwweb/public/assets/**/*.gif
 
+# Except Obsidian vault character art
+!ovault/**/*.png
+!ovault/**/*.jpg
+!ovault/**/*.jpeg
+!ovault/**/*.webp
+
 # Unity specific
 *.pdb
 *.mdb

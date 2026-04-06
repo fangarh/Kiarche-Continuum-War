@@ -319,6 +319,82 @@ export const conceptArts: ConceptArt[] = [
     category: 'characters',
     tags: ['veori', 'fenri', 'hare', 'bioengineer'],
   },
+
+  // --------------------------------------------------------------------------
+  // Дополнительные арты (вторые версии)
+  // --------------------------------------------------------------------------
+  {
+    id: 'veori-ana-2',
+    title: 'Ана Нокси — Нити Гармонии',
+    description: `Ана Нокси в окружении «нитей жизни» — золотисто-зелёных энергетических связей, соединяющих все живые существа Зар'Кай.`,
+    imageUrl: '/assets/characters/veori/ana-noxi-2.png',
+    category: 'characters',
+    tags: ['veori', 'sylni', 'mentor', 'threads-of-life'],
+  },
+  {
+    id: 'veori-rensha-2',
+    title: 'Рен\'Ша — Тень границы',
+    description: `Рен'Ша в режиме скрытности — телепатические усилители приглушены, силуэт растворяется в биолюминесцентном лесу Зар'Кай.`,
+    imageUrl: '/assets/characters/veori/rensha-2.png',
+    category: 'characters',
+    tags: ['veori', 'fenri', 'fox', 'stealth'],
+  },
+  {
+    id: 'veori-rensha-alt',
+    title: 'Рен\'Ша — Дипломат',
+    description: `Рен'Ша в позе мирного контакта — рука поднята, янтарные глаза излучают доверие, зелёные усилители мягко светятся.`,
+    imageUrl: '/assets/characters/veori/rensha.png',
+    category: 'characters',
+    tags: ['veori', 'fenri', 'fox', 'diplomacy'],
+  },
+  {
+    id: 'veori-eldor-alt',
+    title: 'Эл\'Дор — Мудрость Циркл-Поляны',
+    description: `Эл'Дор в священном кругу древних деревьев Зар'Кай. Рога с зелёным свечением, белые flowing robes, телепатическая связь с предками.`,
+    imageUrl: '/assets/characters/veori/eldor.png',
+    category: 'characters',
+    tags: ['veori', 'fenri', 'stag', 'wisdom'],
+  },
+  {
+    id: 'veori-shira-2',
+    title: 'Ши\'Ра — Видение ветвей',
+    description: `Ши'Ра в состоянии концентрации — хохолок поднят, жёлтые глаза светятся, кристаллический узел на груди излучает телепатические волны.`,
+    imageUrl: '/assets/characters/veori/shira-2.png',
+    category: 'characters',
+    tags: ['veori', 'fenri', 'owl', 'vision'],
+  },
+  {
+    id: 'velketh-apophis-alt',
+    title: 'Апофис — Военный Командир (альт.)',
+    description: `Апофис в полной боевой готовности — чёрные доспехи с красными рунами, парные жезлы, шрамы от энергетических ожогов.`,
+    imageUrl: '/assets/characters/velketh/apophis.png',
+    category: 'characters',
+    tags: ['velketh', 'hero', 'apophis', 'warlord'],
+  },
+  {
+    id: 'velketh-zulken-alt',
+    title: "Зул'Кен — Жрец-вдохновитель (альт.)",
+    description: `Зул'Кен в ритуальной позе — нанитовые узоры пульсируют, фанатичный взгляд, обращает толпу одним словом.`,
+    imageUrl: '/assets/characters/velketh/zulken.png',
+    category: 'characters',
+    tags: ['velketh', 'hero', 'zulken', 'priest'],
+  },
+  {
+    id: 'tion-sel-1',
+    title: 'Клон-Мастер Сел — Генетик (версия 1)',
+    description: `Сел в лаборатории клонирования — белый халат с зелёными акцентами, генетические сканеры, колбы с клонами на заднем плане.`,
+    imageUrl: '/assets/characters/tion/sel-1.png',
+    category: 'characters',
+    tags: ['tion', 'hero', 'geneticist', 'cloning'],
+  },
+  {
+    id: 'tion-sel-2',
+    title: 'Клон-Мастер Сел — Генетик (версия 2)',
+    description: `Альтернативный образ Села — более технологичный, с расширенным нейроинтерфейсом и голографическими дисплеями.`,
+    imageUrl: '/assets/characters/tion/sel-2.png',
+    category: 'characters',
+    tags: ['tion', 'hero', 'geneticist', 'cloning-alt'],
+  },
 ];
 
 // ============================================================================
