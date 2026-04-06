@@ -202,7 +202,7 @@ export const architectureData: ArchitectureData = {
     },
     {
       name: 'Combat.TurnBased',
-      description: 'Пошаговый режим: очереди ходов, таймеры, действия за ход.',
+      description: 'RTS-режим: непрерывное время, команды игрока, тайминги способностей и реакция ИИ.',
       path: 'src/Combat/TurnBased',
       dependencies: ['Combat', 'GameState'],
     },
@@ -280,7 +280,7 @@ export const architectureData: ArchitectureData = {
     },
     {
       name: 'AI.Strategy',
-      description: 'Стратегический ИИ: развитие империи, дипломатия, исследования.',
+      description: 'Стратегический ИИ: развитие базы, tech tiers, логистика и контроль карты.',
       path: 'src/AI/Strategy',
       dependencies: ['AI', 'Factions'],
     },

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Kiarche Continuum War** — научно-фантастическая 4X-стратегия с элементами RPG, разрабатываемая для Early Access. Проект включает Unity-игру и документационный веб-портал.
+**Kiarche Continuum War** — научно-фантастическая RTS-стратегия с героями, разрабатываемая для Early Access. Проект включает Unity-игру и документационный веб-портал.
 
 ## Repository Structure
 

@@ -404,7 +404,7 @@ export const conceptArts: ConceptArt[] = [
 export const homePageData: HomePageData = {
   hero: {
     title: 'Kiarche Continuum War',
-    tagline: 'Стройте империю. Нанимайте героев. Исследуйте галактику.',
+    tagline: 'Развивайте базу. Нанимайте героев. Контролируйте узлы Portal Network.',
     ctaPrimary: {
       label: 'Об игре',
       path: '/overview',
@@ -416,15 +416,15 @@ export const homePageData: HomePageData = {
   },
   gameInfo: {
     title: 'Kiarche Continuum War',
-    tagline: 'Стройте империю. Нанимайте героев. Исследуйте галактику.',
+    tagline: 'Развивайте базу. Нанимайте героев. Контролируйте узлы Portal Network.',
     description: `
-      Классическая 4X-стратегия с элементами RPG.
+      Научно-фантастическая RTS-стратегия с героями.
 
       Молодые расы галактики обнаружили Portal Network — сеть древних порталов,
       оставленных цивилизацией Синтекс. Исследуйте галактику, нанимайте героев,
       развивайте технологии и определяйте судьбу цивилизаций.
     `,
-    genre: ['4X Strategy', 'Turn-Based Strategy', 'RPG', 'Sci-Fi'],
+    genre: ['RTS Strategy', 'Hero Units', 'Sci-Fi'],
     platforms: ['PC (Windows)'],
     targetAudience: 'Любители стратегий и RPG',
     features: [

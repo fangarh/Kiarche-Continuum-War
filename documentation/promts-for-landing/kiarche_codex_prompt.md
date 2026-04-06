@@ -13,7 +13,7 @@ high-end web experiences.
 ## CONTEXT
 
 Project: Kiarche Continuum War\
-Genre: Sci-Fi 4X Strategy + RPG\
+Genre: Sci-Fi RTS Strategy + Hero Units\
 Platform: PC (Windows)
 
 Core pillars: - Explore / Expand / Exploit / Exterminate - Heroes

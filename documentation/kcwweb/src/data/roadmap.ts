@@ -8,7 +8,7 @@ import type { RoadmapData } from '../types';
 //
 // Текущая дата: март 2026
 //
-// Жанр: 4X-стратегия с элементами RPG (Hero Units)
+// Жанр: RTS-стратегия с героями (Hero Units)
 //
 // СТАТУС (март 2026):
 // - ✅ Flow Fields Pathfinding — реализовано для 400+ юнитов
@@ -45,7 +45,7 @@ import type { RoadmapData } from '../types';
 //
 // ИГРАБЕЛЬНЫЕ РАСЫ (в разработке):
 // - Тал'Син — уникальная механика идентичности и синхронизации
-// - Молодые расы — классическая 4X-кампания:
+// - Молодые расы — асимметричная RTS-кампания:
 //   1. Ре'Зиры (Re'Zir) — последователи Вел'Кетов, культ, орды
 //   2. Ти'Оны (Ti'On) — последователи Кешари, телепатия, клонирование
 //   3. Ве'Ори (Ve'Ori) — последователи Этернов, созерцание, ненасилие
@@ -60,10 +60,10 @@ import type { RoadmapData } from '../types';
 // - Вел'Кеты — антагонисты (прототип для Ре'Зиров)
 //
 // КАМПАНИИ:
-// - "Молодые расы" — классический 4X, выбор расы
+// - "Молодые расы" — асимметричная RTS, выбор расы
 // - "Тал'Син" — механика идентичности
 //
-// MVP: Родверы + базовые 4X механики + Unity
+// MVP: Родверы + базовые RTS механики + Unity
 // ----------------------------------------------------------------------------
 
 export const roadmapData: RoadmapData = {
@@ -125,7 +125,7 @@ export const roadmapData: RoadmapData = {
           endDate: '2026-11-30',
           tasks: [
             { id: 'task-015', title: 'Движок карты — tilemap, fog of war', completed: false },
-            { id: 'task-016', title: 'Система ходов — пошаговый режим', completed: false },
+            { id: 'task-016', title: 'Система команд и таймингов — RTS режим', completed: false },
             { id: 'task-017', title: 'Система ресурсов — базовые ресурсы и хранилища', completed: false },
             { id: 'task-018', title: 'Система строительства — здания колоний', completed: false },
             { id: 'task-019', title: 'Система юнитов — базовые типы юнитов', completed: false },
@@ -176,7 +176,7 @@ export const roadmapData: RoadmapData = {
         {
           id: 'milestone-portal-network',
           title: 'Portal Network',
-          description: 'Система порталов, исследование, колонизация',
+          description: 'Система порталов, контроль карты и логистика',
           status: 'planned',
           startDate: '2027-01-01',
           endDate: '2027-03-31',
@@ -184,8 +184,8 @@ export const roadmapData: RoadmapData = {
             { id: 'task-031', title: 'Генерация сети порталов — процедурное размещение', completed: false },
             { id: 'task-032', title: 'Активация порталов — стоимость и условия', completed: false },
             { id: 'task-033', title: 'Телепортация — перемещение между порталами', completed: false },
-            { id: 'task-034', title: 'Колонизация через порталы — основание новых колоний', completed: false },
-            { id: 'task-035', title: 'Захват порталов — военные действия', completed: false },
+            { id: 'task-034', title: 'Закрепление через порталы — передовые базы и логистика', completed: false },
+            { id: 'task-035', title: 'Захват порталов — военные действия и контроль узлов', completed: false },
             { id: 'task-036', title: 'Особые порталы — легендарные локации', completed: false },
           ],
         },
