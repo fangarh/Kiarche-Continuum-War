@@ -3,7 +3,16 @@ import { Section, SectionHeader, Card, CardBody, CardTitle, CardDescription } fr
 import './Mechanics.css';
 
 export function MechanicsPage() {
-  const { coreLoop, combat, progression, economy, uxPrinciples } = mechanicsData;
+  const {
+    coreLoop,
+    combat,
+    progression,
+    portalNetwork,
+    campaignStructure,
+    factionEndgames,
+    economy,
+    uxPrinciples,
+  } = mechanicsData;
 
   return (
     <div className="mechanics-page">
@@ -77,6 +86,65 @@ export function MechanicsPage() {
                     <span className="level-value">{type.maxLevel}</span>
                   </div>
                 )}
+              </CardBody>
+            </Card>
+          ))}
+        </div>
+      </Section>
+
+      {/* Portal Network */}
+      <Section variant="alt" padding="lg">
+        <SectionHeader
+          title={portalNetwork.title}
+          subtitle="Транспортная сеть и логика войны"
+        />
+        <p className="section-intro">{portalNetwork.description}</p>
+        <div className="principles-grid">
+          {portalNetwork.principles.map((principle) => (
+            <Card key={principle} className="principle-card">
+              <CardBody>
+                <CardDescription>{principle}</CardDescription>
+              </CardBody>
+            </Card>
+          ))}
+        </div>
+      </Section>
+
+      {/* Campaign Structure */}
+      <Section padding="lg">
+        <SectionHeader
+          title={campaignStructure.title}
+          subtitle="Граф миров вместо линейного марша"
+        />
+        <p className="section-intro">{campaignStructure.description}</p>
+        <div className="campaign-grid">
+          {campaignStructure.nodeTypes.map((nodeType) => (
+            <Card key={nodeType.name} className="campaign-card">
+              <CardBody>
+                <CardTitle>{nodeType.name}</CardTitle>
+                <CardDescription>{nodeType.description}</CardDescription>
+                <p className="campaign-role">{nodeType.role}</p>
+              </CardBody>
+            </Card>
+          ))}
+        </div>
+      </Section>
+
+      {/* Faction Endgames */}
+      <Section variant="alt" padding="lg">
+        <SectionHeader
+          title="Фракционные Финалы"
+          subtitle="Как Родверы и Тал'Син закрывают сектор"
+        />
+        <div className="endgame-grid">
+          {factionEndgames.map((endgame) => (
+            <Card key={endgame.faction} className="endgame-card">
+              <CardBody>
+                <CardTitle>{endgame.faction}</CardTitle>
+                <CardDescription>{endgame.summary}</CardDescription>
+                <p className="endgame-line"><strong>Цель:</strong> {endgame.objective}</p>
+                <p className="endgame-line"><strong>Контригра:</strong> {endgame.counterplay}</p>
+                <p className="endgame-line"><strong>Итог:</strong> {endgame.outcome}</p>
               </CardBody>
             </Card>
           ))}

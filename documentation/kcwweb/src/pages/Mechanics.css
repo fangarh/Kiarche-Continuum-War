@@ -136,6 +136,33 @@
   background: rgba(30, 33, 56, 0.6);
 }
 
+.principles-grid,
+.campaign-grid,
+.endgame-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.principle-card,
+.campaign-card,
+.endgame-card {
+  background: rgba(30, 33, 56, 0.6);
+}
+
+.campaign-role,
+.endgame-line {
+  color: #b8b8d1;
+  line-height: 1.7;
+  margin: 0.85rem 0 0;
+}
+
+.endgame-line strong {
+  color: #fff;
+}
+
 .max-level {
   display: flex;
   justify-content: space-between;
@@ -284,6 +311,9 @@
 
   .combat-features,
   .progression-types,
+  .principles-grid,
+  .campaign-grid,
+  .endgame-grid,
   .currencies-grid,
   .resources-grid,
   .ux-principles {

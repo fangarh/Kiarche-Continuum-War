@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Core Gameplay Loop"
 aliases:
   - Основной игровой цикл

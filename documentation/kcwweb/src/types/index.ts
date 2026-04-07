@@ -127,6 +127,32 @@ export interface EconomySystem {
   resources: Resource[];
 }
 
+export interface PortalNetworkSystem {
+  title: string;
+  description: string;
+  principles: string[];
+}
+
+export interface CampaignNodeType {
+  name: string;
+  description: string;
+  role: string;
+}
+
+export interface CampaignStructure {
+  title: string;
+  description: string;
+  nodeTypes: CampaignNodeType[];
+}
+
+export interface FactionEndgame {
+  faction: string;
+  summary: string;
+  objective: string;
+  counterplay: string;
+  outcome: string;
+}
+
 export interface Currency {
   name: string;
   symbol: string;
@@ -175,6 +201,9 @@ export interface MechanicsData {
   combat: CombatSystem;
   progression: ProgressionSystem;
   youngRaces: YoungRacesSystem;
+  portalNetwork: PortalNetworkSystem;
+  campaignStructure: CampaignStructure;
+  factionEndgames: FactionEndgame[];
   economy: EconomySystem;
   uxPrinciples: UXPrinciple[];
 }
