@@ -84,6 +84,11 @@ Desktop.ini
 
 # Images are tracked by default
 
+# Deploy runtime files
+documentation/deploy/.env
+documentation/deploy/backups/
+documentation/deploy/artifacts/
+
 # Unity asset .meta files are tracked by default
 
 # Unity specific

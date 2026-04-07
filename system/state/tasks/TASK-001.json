@@ -1,0 +1,60 @@
+{
+    "task_id": "TASK-001",
+    "type": "standard",
+    "status": "ready_for_execution",
+    "context_version": "v1",
+    "goal": "Prepare Ubuntu 24 VPS deployment flow for kcwweb with Git sync, repository-managed scripts, and one-command rollout",
+    "assigned_agents": [
+        "Agent D",
+        "Agent G",
+        "Agent F",
+        "Agent H"
+    ],
+    "ownership": {
+        "paths": [
+            "documentation/kcwweb",
+            "documentation/deploy"
+        ],
+        "critical_files": [
+            "documentation/kcwweb/package.json",
+            "documentation/deploy/deploy.sh",
+            "documentation/deploy/deploy.ps1",
+            "documentation/deploy/.env.example",
+            "documentation/deploy/README.md"
+        ]
+    },
+    "depends_on": [],
+    "verification": {
+        "type": "command",
+        "shell": "powershell",
+        "commands": [
+            "npm run build",
+            "if (-not (Test-Path dist)) { exit 1 }"
+        ]
+    },
+    "handoffs": [],
+    "artifacts": [
+        "documentation/deploy/README.md",
+        "documentation/deploy/.env.example",
+        "documentation/deploy/deploy.sh",
+        "documentation/deploy/deploy.ps1"
+    ],
+    "history": [
+        {
+            "date": "2026-04-07",
+            "event": "Task created from orchestrator runtime layer"
+        },
+        {
+            "date": "2026-04-07",
+            "event": "Repository deploy flow prepared in documentation/deploy"
+        },
+        {
+            "date": "2026-04-07",
+            "event": "Local verification passed: npm run build and dist presence check"
+        },
+        {
+            "date": "2026-04-07",
+            "event": "Platform baseline fixed: Windows 11 development, Ubuntu 24 VPS deployment, Git sync workflow"
+        }
+    ]
+}

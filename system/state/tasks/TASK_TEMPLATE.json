@@ -1,0 +1,21 @@
+{
+    "task_id": "TASK-001",
+    "type": "standard",
+    "status": "planned",
+    "context_version": "v1",
+    "goal": "Describe the concrete task outcome here",
+    "assigned_agents": [],
+    "ownership": {
+        "paths": [],
+        "critical_files": []
+    },
+    "depends_on": [],
+    "verification": {
+        "type": "command",
+        "shell": "powershell",
+        "commands": []
+    },
+    "handoffs": [],
+    "artifacts": [],
+    "history": []
+}
