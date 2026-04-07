@@ -4,6 +4,11 @@
     "status": "planned",
     "context_version": "v1",
     "goal": "Describe the concrete task outcome here",
+    "text_rendering_risk": false,
+    "session_mode": false,
+    "checkpoint_ready": false,
+    "escalation_required": false,
+    "escalation_reason": "",
     "assigned_agents": [],
     "ownership": {
         "paths": [],
@@ -13,7 +18,12 @@
     "verification": {
         "type": "command",
         "shell": "powershell",
-        "commands": []
+        "commands": [],
+        "browser": {
+            "enabled": false,
+            "routes": [],
+            "checks": []
+        }
     },
     "handoffs": [],
     "artifacts": [],

@@ -1,0 +1,50 @@
+{
+    "task_id": "LORE-SESSION-001",
+    "type": "standard",
+    "status": "in_progress",
+    "context_version": "v1",
+    "goal": "Discuss and update a coherent lore batch across related sections",
+    "text_rendering_risk": false,
+    "session_mode": true,
+    "checkpoint_ready": false,
+    "escalation_required": false,
+    "escalation_reason": "",
+    "assigned_agents": [
+        "Agent E"
+    ],
+    "ownership": {
+        "paths": [
+            "ovault",
+            "documentation"
+        ],
+        "critical_files": []
+    },
+    "depends_on": [],
+    "verification": {
+        "type": "deferred",
+        "shell": "powershell",
+        "commands": [],
+        "browser": {
+            "enabled": false,
+            "routes": [],
+            "checks": []
+        }
+    },
+    "session_scope": {
+        "theme": "Describe the lore topic or narrative area here",
+        "sections": [],
+        "checkpoint_rules": [
+            "mark checkpoint_ready true after 2-3 coherent related sections",
+            "run consistency pass before commit preparation",
+            "escalate immediately if canon contradiction appears"
+        ]
+    },
+    "handoffs": [],
+    "artifacts": [],
+    "history": [
+        {
+            "date": "2026-04-07",
+            "event": "Lore session task initialized"
+        }
+    ]
+}

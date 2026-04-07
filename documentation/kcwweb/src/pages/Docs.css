@@ -78,10 +78,7 @@
 }
 
 .guide-content {
-  color: #b8b8d1;
-  line-height: 1.8;
   margin-top: 1rem;
-  white-space: pre-wrap;
 }
 
 .guide-subsections {
@@ -105,9 +102,6 @@
 }
 
 .guide-subsection-content {
-  color: #b8b8d1;
-  line-height: 1.7;
-  white-space: pre-wrap;
   font-size: 0.95rem;
 }
 
@@ -240,9 +234,6 @@
 }
 
 .spec-section-content {
-  color: #b8b8d1;
-  line-height: 1.7;
-  white-space: pre-wrap;
   font-size: 0.95rem;
 }
 

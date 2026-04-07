@@ -123,10 +123,14 @@
 }
 
 .entry-text {
-  color: #b8b8d1;
   line-height: 1.9;
-  white-space: pre-line;
-  font-size: 0.95rem;
+}
+
+.entry-text h2,
+.entry-text h3,
+.entry-text h4 {
+  color: #9F7AEA;
+  margin-top: 1.5rem;
 }
 
 .entry-tags {

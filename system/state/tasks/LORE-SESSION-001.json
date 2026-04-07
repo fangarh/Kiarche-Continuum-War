@@ -1,0 +1,77 @@
+{
+    "task_id": "LORE-SESSION-001",
+    "type": "standard",
+    "status": "in_progress",
+    "context_version": "v3",
+    "goal": "Refine one coherent lore batch for the Ve'Ori faction across faction overview, mechanics, and character framing",
+    "text_rendering_risk": true,
+    "session_mode": true,
+    "checkpoint_ready": true,
+    "escalation_required": true,
+    "escalation_reason": "Lore session now affects docs web app visible content and requires standard verification with browser confirmation",
+    "assigned_agents": [
+        "Agent E",
+        "Agent D",
+        "Agent I"
+    ],
+    "ownership": {
+        "paths": [
+            "ovault/Играбельные расы/Ве'Ори",
+            "documentation",
+            "documentation/kcwweb/src"
+        ],
+        "critical_files": []
+    },
+    "depends_on": [],
+    "verification": {
+        "type": "hybrid",
+        "shell": "powershell",
+        "commands": [
+            "npm run build"
+        ],
+        "browser": {
+            "enabled": true,
+            "routes": [
+                "/lore"
+            ],
+            "checks": [
+                "updated lore text renders correctly",
+                "no unreadable symbols or broken encoding are visible",
+                "target section remains readable in browser"
+            ]
+        }
+    },
+    "session_scope": {
+        "theme": "Ve'Ori lore consolidation",
+        "sections": [
+            "Фракция",
+            "Механики",
+            "Персонажи"
+        ],
+        "checkpoint_rules": [
+            "mark checkpoint_ready true after faction overview, mechanics, and one character block align semantically",
+            "run consistency pass before commit preparation",
+            "escalate immediately if canon contradiction appears"
+        ]
+    },
+    "handoffs": [],
+    "artifacts": [],
+    "history": [
+        {
+            "date": "2026-04-07",
+            "event": "Lore session created for Ve'Ori refinement"
+        },
+        {
+            "date": "2026-04-07",
+            "event": "Faction overview and mechanics terminology aligned"
+        },
+        {
+            "date": "2026-04-07",
+            "event": "Character framing discussion started for checkpoint batch"
+        },
+        {
+            "date": "2026-04-07",
+            "event": "Session escalated because the refined lore now affects docs web app visible content"
+        }
+    ]
+}

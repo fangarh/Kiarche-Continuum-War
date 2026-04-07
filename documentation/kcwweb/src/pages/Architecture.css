@@ -56,6 +56,10 @@
   margin-top: 0.25rem;
 }
 
+.module-description {
+  margin-top: 0.75rem;
+}
+
 .module-dependencies {
   margin-top: 1rem;
   padding-top: 1rem;

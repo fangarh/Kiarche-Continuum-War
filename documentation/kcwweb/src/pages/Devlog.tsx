@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { devlogData } from '../data';
-import { Section, SectionHeader, Card, CardBody, CardTitle, Button } from '../components/ui';
+import { Section, SectionHeader, Card, CardBody, CardTitle, Button, MarkdownContent } from '../components/ui';
 import type { DevlogCategory } from '../types';
 import './Devlog.css';
 
@@ -85,7 +85,7 @@ export function DevlogPage() {
                 <CardTitle>{entry.title}</CardTitle>
                 {expandedEntry === entry.id && (
                   <div className="entry-content">
-                    <p className="entry-text">{entry.content}</p>
+                    <MarkdownContent content={entry.content} className="entry-text" />
                     {entry.tags.length > 0 && (
                       <div className="entry-tags">
                         {entry.tags.map((tag) => (

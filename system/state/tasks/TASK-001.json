@@ -4,6 +4,7 @@
     "status": "ready_for_execution",
     "context_version": "v1",
     "goal": "Prepare Ubuntu 24 VPS deployment flow for kcwweb with Git sync, repository-managed scripts, and one-command rollout",
+    "text_rendering_risk": true,
     "assigned_agents": [
         "Agent D",
         "Agent G",
@@ -25,19 +26,37 @@
     },
     "depends_on": [],
     "verification": {
-        "type": "command",
+        "type": "hybrid",
         "shell": "powershell",
         "commands": [
             "npm run build",
             "if (-not (Test-Path dist)) { exit 1 }"
-        ]
+        ],
+        "browser": {
+            "enabled": true,
+            "routes": [
+                "/"
+            ],
+            "checks": [
+                "home route loads without browser errors",
+                "main navigation is visible",
+                "page renders after deploy"
+            ]
+        }
     },
-    "handoffs": [],
+    "handoffs": [
+        {
+            "from": "Agent G",
+            "to": "Agent I",
+            "goal": "Run post-deploy browser smoke verification after command-level deploy checks"
+        }
+    ],
     "artifacts": [
         "documentation/deploy/README.md",
         "documentation/deploy/.env.example",
         "documentation/deploy/deploy.sh",
-        "documentation/deploy/deploy.ps1"
+        "documentation/deploy/deploy.ps1",
+        "browser_report.json"
     ],
     "history": [
         {
@@ -55,6 +74,10 @@
         {
             "date": "2026-04-07",
             "event": "Platform baseline fixed: Windows 11 development, Ubuntu 24 VPS deployment, Git sync workflow"
+        },
+        {
+            "date": "2026-04-07",
+            "event": "Browser-level verification requirements added through MCP Playwright"
         }
     ]
 }

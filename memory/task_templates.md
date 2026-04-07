@@ -8,6 +8,8 @@
 - `Exploration`
 - `Handoff`
 
+Отдельно допускается session-oriented execution для лора и обсуждаемых narrative changes.
+
 ## Зачем модульный подход
 
 Один тяжелый шаблон ломает простые задачи, исследование и быстрые фиксы.
@@ -38,6 +40,11 @@ verification:
 - `goal`: какой результат нужен.
 - `verification`: как понять, что задача выполнена.
 
+Дополнительные session-поля могут использоваться для narrative/lore задач:
+
+- `session_mode`
+- `checkpoint_ready`
+
 ## Lite
 
 Для простых локальных задач в одном домене.
@@ -48,6 +55,8 @@ verification:
 - изменение небольшое;
 - проверка очевидна;
 - делегация, скорее всего, не нужна.
+
+Не использовать `Lite`, если меняется видимый пользовательский текст и нельзя доказать корректность без проверки рендера.
 
 Шаблон:
 
@@ -129,6 +138,7 @@ risks:
 
 - `Agent F` для git/release hygiene;
 - `Agent G` для deploy/VPS rollout preparation.
+- `Agent I` для MCP Playwright browser verification.
 
 ## Exploration
 
@@ -170,6 +180,8 @@ verification:
 
 - `Exploration` не требует финального ownership с самого начала;
 - после исследования задача должна быть переведена в `Lite` или `Standard`.
+
+Если проблема проявляется только в браузере, exploration должна явно зафиксировать, что нужна MCP Playwright verification.
 
 ## Handoff
 
@@ -220,12 +232,53 @@ handoff_contract:
 
 `deployment_notes` и `git_notes` обязательны только если handoff связан с релизом, деплоем или подготовкой к передаче на VPS.
 
+## Session Mode
+
+Это не отдельный task type, а execution flag для narrative/lore задач.
+
+Использовать, когда:
+
+- обсуждение идет постепенно;
+- изменения логически связаны;
+- запуск полного пайплайна после каждой микроправки не нужен.
+
+Минимальные поля:
+
+```text
+session_mode: true
+checkpoint_ready: false
+```
+
+Правила:
+
+- пока `checkpoint_ready: false`, можно накапливать смысловые правки в одной задаче;
+- при переходе в `checkpoint_ready: true` задача должна пройти consistency/review/commit checkpoint, если это требуется контекстом;
+- `session_mode` лучше всего подходит для лора, worldbuilding и markdown narrative batches.
+- Для runtime-state можно использовать отдельный шаблон `system/state/tasks/LORE_SESSION_TEMPLATE.json`.
+
 ## Правила выбора шаблона
 
 - Если задача маленькая и локальная, выбирай `Lite`.
 - Если задача содержит этапы, интеграцию или несколько доменов, выбирай `Standard`.
 - Если сначала нужно выяснить, что вообще происходит, выбирай `Exploration`.
 - Если задача переходит между агентами или итерациями, используй `Handoff`.
+
+Для web/UI задач verification желательно уточнять отдельно:
+
+- `command` — build/lint/filesystem/process checks;
+- `browser` — MCP Playwright route/UI/interactions verification;
+- `hybrid` — сначала command, потом browser.
+
+Если задача меняет:
+
+- headings;
+- labels;
+- CTA text;
+- markdown content;
+- portal or landing copy;
+- локализованные строки;
+
+то verification не должна оставаться только `command`.
 
 ## Правила перехода между режимами
 
@@ -239,5 +292,6 @@ handoff_contract:
 
 - Не использовать `Standard` для микроправок без реальной пользы.
 - Не использовать `Lite`, если затрагивается несколько доменов.
+- Не использовать `Lite` для изменений пользовательского текста, если не запланирована проверка отображения.
 - Не заставлять `Exploration` притворяться полноценным планом до завершения исследования.
 - Не передавать задачу агенту без `Handoff`, если уже были изменения или промежуточные выводы.

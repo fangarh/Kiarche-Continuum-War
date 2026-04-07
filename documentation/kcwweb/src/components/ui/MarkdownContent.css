@@ -1,0 +1,112 @@
+.markdown-content {
+  color: #b8b8d1;
+  line-height: 1.75;
+  font-size: 0.95rem;
+}
+
+.markdown-content > :last-child {
+  margin-bottom: 0;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4,
+.markdown-content h5,
+.markdown-content h6 {
+  margin: 0 0 0.75rem;
+  text-transform: none;
+  letter-spacing: 0.04em;
+  text-shadow: none;
+}
+
+.markdown-content p,
+.markdown-content ul,
+.markdown-content ol,
+.markdown-content pre,
+.markdown-content table,
+.markdown-content blockquote,
+.markdown-content hr {
+  margin: 0 0 1rem;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  padding-left: 1.25rem;
+}
+
+.markdown-content ul {
+  list-style: disc;
+}
+
+.markdown-content ol {
+  list-style: decimal;
+}
+
+.markdown-content li + li {
+  margin-top: 0.35rem;
+}
+
+.markdown-content strong {
+  color: #ffffff;
+}
+
+.markdown-content code {
+  font-family: var(--font-family-mono);
+  font-size: 0.9em;
+  background: rgba(11, 13, 23, 0.8);
+  border: 1px solid rgba(123, 44, 191, 0.2);
+  border-radius: 6px;
+  padding: 0.15rem 0.4rem;
+}
+
+.markdown-content pre {
+  overflow-x: auto;
+  background: rgba(11, 13, 23, 0.85);
+  border: 1px solid rgba(123, 44, 191, 0.25);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.markdown-content pre code {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+}
+
+.markdown-content table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.markdown-content th,
+.markdown-content td {
+  border: 1px solid rgba(123, 44, 191, 0.2);
+  padding: 0.65rem 0.8rem;
+  text-align: left;
+}
+
+.markdown-content th {
+  color: #ffffff;
+  background: rgba(107, 70, 193, 0.18);
+}
+
+.markdown-content tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.markdown-content blockquote {
+  border-left: 3px solid #6b46c1;
+  padding-left: 1rem;
+  color: #d7d7ec;
+}
+
+.markdown-content a {
+  color: #9f7aea;
+}
+
+.markdown-content hr {
+  border: 0;
+  border-top: 1px solid rgba(123, 44, 191, 0.25);
+}

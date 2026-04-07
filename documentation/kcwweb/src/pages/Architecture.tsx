@@ -1,5 +1,5 @@
 import { architectureData } from '../data';
-import { Section, SectionHeader, Card, CardBody, CardTitle, CardDescription } from '../components/ui';
+import { Section, SectionHeader, Card, CardBody, CardTitle, CardDescription, MarkdownContent } from '../components/ui';
 import './Architecture.css';
 
 export function ArchitecturePage() {
@@ -31,7 +31,7 @@ export function ArchitecturePage() {
                   <CardTitle>{module.name}</CardTitle>
                   <code className="module-path">{module.path}</code>
                 </div>
-                <CardDescription>{module.description}</CardDescription>
+                <MarkdownContent content={module.description} className="module-description" />
                 {module.dependencies.length > 0 && (
                   <div className="module-dependencies">
                     <span className="deps-label">Зависимости:</span>

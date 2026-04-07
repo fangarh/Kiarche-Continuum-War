@@ -19,6 +19,17 @@ Core Loop:
 8. If failed → retry or downgrade task
 9. If passed → finalize + update state
 
+Verification Order:
+
+1. run command-level verification first
+2. if task requires rendered UI confirmation, assign browser verification through MCP Playwright
+3. only finalize after both required layers pass
+
+Text Change Rule:
+
+- if the task changes visible user-facing text, headings, labels, markdown, portal content, or landing copy, browser verification is mandatory
+- command-only success is not enough for text-rendering-sensitive changes
+
 Rules:
 
 - MUST NOT modify files directly unless no delegation needed

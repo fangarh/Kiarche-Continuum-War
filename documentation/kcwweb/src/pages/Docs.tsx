@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { documentationData } from '../data';
-import { Section, SectionHeader, Card, CardBody, CardTitle, CardDescription, Button } from '../components/ui';
+import { Section, SectionHeader, Card, CardBody, CardTitle, CardDescription, Button, MarkdownContent } from '../components/ui';
 import type { Specification } from '../types';
 import './Docs.css';
 
@@ -88,13 +88,13 @@ export function DocsPage() {
               <Card key={section.id} className="guide-card">
                 <CardBody>
                   <CardTitle>{section.title}</CardTitle>
-                  <div className="guide-content" dangerouslySetInnerHTML={{ __html: section.content.replace(/\n/g, '<br />') }} />
+                  <MarkdownContent content={section.content} className="guide-content" />
                   {section.subsections && (
                     <div className="guide-subsections">
                       {section.subsections.map((sub) => (
                         <div key={sub.id} className="guide-subsection">
                           <h4 className="guide-subsection-title">{sub.title}</h4>
-                          <div className="guide-subsection-content" dangerouslySetInnerHTML={{ __html: sub.content.replace(/\n/g, '<br />') }} />
+                          <MarkdownContent content={sub.content} className="guide-subsection-content" />
                         </div>
                       ))}
                     </div>
@@ -188,7 +188,7 @@ export function DocsPage() {
                       {spec.sections.map((section) => (
                         <div key={section.id} className="spec-section">
                           <h4 className="spec-section-title">{section.title}</h4>
-                          <div className="spec-section-content" dangerouslySetInnerHTML={{ __html: section.content.replace(/\n/g, '<br />') }} />
+                          <MarkdownContent content={section.content} className="spec-section-content" />
                         </div>
                       ))}
                     </div>

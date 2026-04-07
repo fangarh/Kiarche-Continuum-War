@@ -89,6 +89,12 @@ documentation/deploy/.env
 documentation/deploy/backups/
 documentation/deploy/artifacts/
 
+# Playwright / MCP browser artifacts
+.playwright-mcp/
+playwright-report/
+test-results/
+blob-report/
+
 # Unity asset .meta files are tracked by default
 
 # Unity specific

@@ -117,6 +117,7 @@ No automated test suite exists. Validate changes manually:
 - **Lore/docs agent**: `documentation/`, `ovault/`, markdown content, worldbuilding consistency, structured documentation updates.
 - **Git agent**: branch hygiene, diff inspection, commit preparation, change grouping, conflict awareness, and safe repository operations.
 - **Dev-Ops agent**: deployment packaging, VPS-ready scripts, environment templates, build/run instructions, and reproducible website/landing rollout flow.
+- **Browser/Playwright agent**: browser-level verification via MCP Playwright, page navigation, UI smoke tests, route checks, and regression confirmation for the docs site or landing.
 - **Review/verification agent**: focused read-only pass for regressions, missing tests, risky assumptions, or build/lint validation follow-up.
 
 ### Permanent Agent Profiles
@@ -128,10 +129,12 @@ No automated test suite exists. Validate changes manually:
 - **Agent F — Git**: worker for git hygiene, commit staging strategy, change auditing, branch readiness, and safe release preparation.
 - **Agent G — Dev-Ops**: worker for VPS deployment assets, scripts, env examples, deploy instructions, and one-command rollout preparation for site and landing.
 - **Agent H — Review And Verification**: explorer or reviewer for regression checks, risk scanning, test/build/lint follow-up, and implementation review.
+- **Agent I — Browser And Playwright**: worker for MCP Playwright verification, route walkthroughs, page-level smoke tests, interaction checks, and post-deploy browser validation.
 
 ### Delegation Rules By Task Type
 - **Unity-only feature**: use one focused Unity agent; add a second verification agent only if the change is broad or risky.
 - **Web-only feature**: use one web docs agent; add a review agent for build/lint follow-up if needed.
+- **Web UI verification**: use the Browser/Playwright agent when correctness depends on rendered routes, interactions, modal flows, navigation, or post-deploy page checks.
 - **Deployment preparation**: use the web docs agent for app changes and the Dev-Ops agent for packaging and VPS rollout assets.
 - **Commit/release preparation**: use the Git agent after implementation when changes need clean grouping, reviewable diffs, or release-ready handoff.
 - **Cross-project feature**: run Unity and web agents in parallel when codebases do not overlap, then integrate results locally.
@@ -145,6 +148,25 @@ No automated test suite exists. Validate changes manually:
 - Repository synchronization baseline: Git-based workflow between local development and VPS.
 - For website or landing deployment, Ubuntu VPS is the canonical execution target.
 - Windows may be used for local build verification, but it is not the primary production deploy path unless explicitly requested.
+
+### MCP Playwright Usage
+- Use MCP Playwright for browser-level verification of `documentation/kcwweb` and landing flows when command-only verification is insufficient.
+- Prefer MCP Playwright for route smoke tests, UI regression confirmation, modal/dialog behavior, navigation checks, and deploy validation through a real browser.
+- Prefer command-based verification for build, lint, filesystem checks, and server/process health.
+- When both are needed, run command verification first and browser verification second.
+
+### Text Rendering Risk
+- Any change to user-facing text, labels, headings, markdown content, portal content, landing content, or localized strings must not be treated as command-only verification.
+- For web-visible text changes, verification must be at least `hybrid` and include browser-level confirmation.
+- If a change could introduce unreadable symbols, broken encoding, invisible characters, or rendering anomalies, the task must be upgraded out of `Lite` if needed.
+- Portal or landing text changes should default to MCP Playwright verification unless the user explicitly limits scope.
+
+### Lore Session Mode
+- Lore discussion and gradual worldbuilding updates may run in a session-oriented mode instead of spawning full orchestration after every micro-change.
+- In Lore Session Mode, multiple small related lore edits are grouped into one session task with incrementing `context_version`.
+- Agent spawning, consistency review, and commit preparation are deferred until a semantic checkpoint is reached.
+- A checkpoint is typically a completed batch such as 2-3 related sections, one faction block, one era block, or another coherent lore package.
+- Full verification and commit/release handling should happen at checkpoint time, not after every sentence-level adjustment.
 
 ### Ownership And Safety
 - Every spawned worker must receive explicit file or folder ownership.
