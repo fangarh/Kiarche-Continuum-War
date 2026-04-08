@@ -109,8 +109,12 @@ context_scope:
   owners:
     - Agent ...
 support_agents:
+  - Agent J
   - Agent F
   - Agent G
+plan_review_status:
+plan_review_findings:
+  - ...
 context_snapshot:
   facts:
     - ...
@@ -134,11 +138,18 @@ risks:
 - `plan`;
 - `risks`.
 
+Если используется `Agent J`, в `Standard` задаче желательно явно фиксировать:
+
+- `plan_review_status`: `pending`, `approved`, `approved_with_risks`, `refine`, `skipped`;
+- `plan_review_findings`: краткие замечания или основание для `skipped`.
+
 `support_agents` использовать, если задаче нужны:
 
+- `Agent J` для однократной ревизии плана до начала реализации;
 - `Agent F` для git/release hygiene;
 - `Agent G` для deploy/VPS rollout preparation.
 - `Agent I` для MCP Playwright browser verification.
+- Unity MCP verification pass для Unity runtime/editor проверки после реализации.
 
 ## Exploration
 
@@ -182,6 +193,8 @@ verification:
 - после исследования задача должна быть переведена в `Lite` или `Standard`.
 
 Если проблема проявляется только в браузере, exploration должна явно зафиксировать, что нужна MCP Playwright verification.
+Если после исследования формируется план реализации, для `Exploration -> Lite/Standard` допускается одна ревизия плана через Agent J перед стартом исполнения.
+Если ревизия пропущена, в следующем шаблоне нужно явно указать основание для `skipped`.
 
 ## Handoff
 
@@ -232,6 +245,11 @@ handoff_contract:
 
 `deployment_notes` и `git_notes` обязательны только если handoff связан с релизом, деплоем или подготовкой к передаче на VPS.
 
+Для handoff после ревизии плана можно дополнительно фиксировать:
+
+- `plan_review_status`: `approved`, `approved_with_risks`, `refine` или `skipped`;
+- `plan_review_findings`: краткий список замечаний, если они были.
+
 ## Session Mode
 
 Это не отдельный task type, а execution flag для narrative/lore задач.
@@ -269,6 +287,17 @@ checkpoint_ready: false
 - `browser` — MCP Playwright route/UI/interactions verification;
 - `hybrid` — сначала command, потом browser.
 
+Для Unity задач verification желательно уточнять отдельно:
+
+- `unity-mcp` — Unity MCP console/scene/runtime/editor verification;
+- `hybrid-unity` — локальные проверки или review плюс обязательная Unity MCP verification.
+
+Для Unity MCP findings желательно дополнительно указывать:
+
+- `blocking` — требует возврата на доработку;
+- `non-blocking` — не требует возврата, но фиксируется;
+- `informational` — наблюдение без действия.
+
 Если задача меняет:
 
 - headings;
@@ -287,6 +316,9 @@ checkpoint_ready: false
 - `Standard -> Handoff`, если работа передается другому агенту.
 - `Lite -> Handoff`, если даже простая задача уходит на review или возврат.
 - После ошибки на тесте повышай `context_version`.
+- После ошибки на Unity MCP verification повышай `context_version` и возвращай задачу профильному Unity-агенту.
+- После ревизии плана не запускать второй review-pass того же плана: либо доработай его один раз, либо эскалируй блокеры пользователю.
+- Если план review был `skipped`, причина пропуска должна быть зафиксирована в задаче, а не подразумеваться.
 
 ## Антипаттерны
 

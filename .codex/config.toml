@@ -1,0 +1,12 @@
+[mcp_servers.unity-mcp]
+command = 'C:\Users\Admin\.unity\relay\relay_win.exe'
+args = ["--mcp"]
+
+[mcp_servers.unity-mcp.tools.Unity_GetConsoleLogs]
+approval_mode = "approve"
+
+[mcp_servers.unity-mcp.tools.Unity_Camera_Capture]
+approval_mode = "approve"
+
+[mcp_servers.unity-mcp.tools.Unity_RunCommand]
+approval_mode = "approve"

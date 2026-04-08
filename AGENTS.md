@@ -70,6 +70,7 @@ No automated test suite exists. Validate changes manually:
 ## Operational Extensions
 - `memory/agent_profiles.md` is the authoritative operational playbook for agent roles, routing, iteration flow, and task handoff usage.
 - `memory/task_templates.md` is the authoritative template source for `Lite`, `Standard`, `Exploration`, and `Handoff` task formats.
+- `memory/execution_flow.md` is the canonical short-form execution checklist for task progression from triage through verification and handoff.
 - `memory/vps_deploy_workflow.md` is the authoritative deployment playbook for preparing and shipping the docs site and landing to a personal VPS.
 - Additional workflow-specific files in `memory/` may extend this system, but they must be explicitly referenced here before they are treated as normative.
 - If there is any conflict, `AGENTS.md` defines the top-level policy and the referenced `memory/` files define the operational detail.
@@ -96,6 +97,9 @@ No automated test suite exists. Validate changes manually:
 - For `small` tasks: write a short local plan and proceed.
 - For `multi-step` tasks: create an explicit staged plan before implementation.
 - For `uncertain` tasks: investigate first, then convert findings into a concrete plan.
+- For `multi-step` and `uncertain` tasks, run one plan-review pass before implementation. The reviewer may approve the plan or return it once for refinement.
+- Plan review is single-pass only: after one review-and-refinement cycle, either proceed with the revised plan or escalate open blockers to the user.
+- The plan review pass may be skipped only for repeatable, low-ambiguity workflows where ownership, verification, and task decomposition already follow an established pattern and no new cross-domain risk is introduced.
 - If planning reveals cross-domain impact, switch from local execution to multi-agent orchestration.
 - If verification is unclear, planning is incomplete and implementation should not start yet.
 
@@ -115,6 +119,7 @@ No automated test suite exists. Validate changes manually:
 - **Unity UI/input/camera agent**: `KiarcheContinuumWar/Assets/Scripts/UI/`, `InputSystem/`, `CameraSystem/`, player interaction, HUD, camera controls.
 - **Web docs agent**: `documentation/kcwweb/src/`, React/Vite pages, components, typed data, styling, markdown rendering.
 - **Lore/docs agent**: `documentation/`, `ovault/`, markdown content, worldbuilding consistency, structured documentation updates.
+- **Plan review agent**: read-only review of the generated plan, scope, verification logic, dependency assumptions, and delegation choices before implementation starts.
 - **Git agent**: branch hygiene, diff inspection, commit preparation, change grouping, conflict awareness, and safe repository operations.
 - **Dev-Ops agent**: deployment packaging, VPS-ready scripts, environment templates, build/run instructions, and reproducible website/landing rollout flow.
 - **Browser/Playwright agent**: browser-level verification via MCP Playwright, page navigation, UI smoke tests, route checks, and regression confirmation for the docs site or landing.
@@ -126,13 +131,14 @@ No automated test suite exists. Validate changes manually:
 - **Agent C — Unity UX**: worker for UI, player input, camera behavior, and in-scene interaction polish.
 - **Agent D — Web Docs**: worker for `documentation/kcwweb/`, React pages/components/styles, typed content wiring, and docs-site UX.
 - **Agent E — Lore And Writing**: worker for `documentation/` and `ovault/`, lore consistency, markdown restructuring, and narrative documentation.
+- **Agent J — Plan Reviewer**: reviewer for plan quality before implementation, checking task decomposition, ownership boundaries, verification completeness, and risk coverage. This review is performed at most once per task.
 - **Agent F — Git**: worker for git hygiene, commit staging strategy, change auditing, branch readiness, and safe release preparation.
 - **Agent G — Dev-Ops**: worker for VPS deployment assets, scripts, env examples, deploy instructions, and one-command rollout preparation for site and landing.
 - **Agent H — Review And Verification**: explorer or reviewer for regression checks, risk scanning, test/build/lint follow-up, and implementation review.
 - **Agent I — Browser And Playwright**: worker for MCP Playwright verification, route walkthroughs, page-level smoke tests, interaction checks, and post-deploy browser validation.
 
 ### Delegation Rules By Task Type
-- **Unity-only feature**: use one focused Unity agent; add a second verification agent only if the change is broad or risky.
+- **Unity-only feature**: use one focused Unity agent; after implementation, always run a Unity MCP verification pass before considering the task done. Add a second verification agent if the change is broad or risky.
 - **Web-only feature**: use one web docs agent; add a review agent for build/lint follow-up if needed.
 - **Web UI verification**: use the Browser/Playwright agent when correctness depends on rendered routes, interactions, modal flows, navigation, or post-deploy page checks.
 - **Deployment preparation**: use the web docs agent for app changes and the Dev-Ops agent for packaging and VPS rollout assets.
@@ -155,6 +161,18 @@ No automated test suite exists. Validate changes manually:
 - Prefer command-based verification for build, lint, filesystem checks, and server/process health.
 - When both are needed, run command verification first and browser verification second.
 
+### Unity MCP Usage
+- Use Unity MCP for post-implementation verification of every Unity code change in `KiarcheContinuumWar/` before the task can be considered complete.
+- Unity verification should include the safest applicable mix of: console log inspection, scene/state inspection, Play Mode checks when relevant, and targeted runtime/editor command execution.
+- Classify Unity MCP findings as `blocking`, `non-blocking`, or `informational`.
+- `blocking` findings include failed MCP commands, compile/runtime errors, broken scene/runtime behavior, missing expected objects/components, or warnings that directly indicate the task result is not reliable.
+- `non-blocking` findings include known editor noise, pre-existing warnings not caused by the task, or tool-side warnings that do not invalidate the feature under test.
+- `informational` findings include observations worth recording without requiring rework.
+- If Unity MCP verification finds a `blocking` issue, return the task to the responsible Unity agent for rework and increment `context_version`.
+- Non-blocking and informational findings should be recorded in the verification summary but must not trigger automatic rework by themselves.
+- Unity-only tasks should default to a verification loop of `implement -> Unity MCP verify -> fix -> Unity MCP re-verify`.
+- If the same Unity task exceeds **3 full implementation/verification iterations**, stop the autonomous loop and ask the user for help with a short summary of attempts, remaining symptoms, and current blockers.
+
 ### Text Rendering Risk
 - Any change to user-facing text, labels, headings, markdown content, portal content, landing content, or localized strings must not be treated as command-only verification.
 - For web-visible text changes, verification must be at least `hybrid` and include browser-level confirmation.
@@ -173,14 +191,29 @@ No automated test suite exists. Validate changes manually:
 - Workers must be told they are not alone in the codebase and must not revert unrelated edits.
 - Do not delegate destructive git operations.
 - Do not delegate broad exploratory work without a concrete question or output.
+- The plan review agent is read-only and must not implement the task or rewrite the full plan from scratch unless the owner requests refinement.
 - If the task is small, urgent, or tightly coupled, handle it locally instead of spawning.
+
+### Plan Review Loop
+- For `multi-step` and `uncertain` tasks, create the initial plan first, then send it to the plan review agent for a single review pass.
+- The plan review agent checks decomposition quality, ownership conflicts, verification sufficiency, dependency assumptions, whether delegation is justified, and whether risks are explicit.
+- A plan should be marked `refine` only when there is a material issue: missing or unclear verification, ownership conflict, hidden dependency on another domain, unjustified delegation, unsequenced critical-path work, or unresolved blocker that makes implementation unsafe.
+- A plan may be marked `approve with risks` when risks remain but implementation order, ownership, and verification are still adequate.
+- If the review finds material issues, return the plan once for refinement before implementation starts.
+- After one refinement, do not repeat plan review. Either proceed with the revised plan or ask the user to resolve the remaining blockers.
 
 ### Iteration Policy
 - Use a verification loop when work includes testing, review, or user-reported bug reproduction.
 - Standard loop: `implement -> test/review -> fix -> re-test`.
 - If a defect is found, send it back to the responsible domain agent for another iteration.
-- If the same task reaches more than **3 iterations**, stop the autonomous loop and discuss the problem with the user before continuing.
+- For Unity work, the verification step must use Unity MCP before the task is considered complete.
+- If the same task reaches more than **3 iterations**, stop the autonomous loop and ask the user for help before continuing.
 - After the third failed iteration, summarize what was tried, what failed, and which assumptions or constraints are blocking progress.
+
+### Review Role Split
+- `Agent J` reviews plan quality before implementation.
+- `Agent H` reviews implementation results, regressions, and verification outcomes after or alongside execution.
+- Do not use `Agent H` as a substitute for the mandatory pre-implementation plan review when `Agent J` is required.
 
 ## Commit & Pull Request Guidelines
 - **Commits**: Imperative, scope-first subjects (e.g., `Add movement`, `Fix menu layout`). Avoid placeholders like `123`.
