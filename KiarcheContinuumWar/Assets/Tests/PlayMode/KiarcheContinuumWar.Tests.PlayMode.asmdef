@@ -1,0 +1,22 @@
+{
+    "name": "KiarcheContinuumWar.Tests.PlayMode",
+    "rootNamespace": "",
+    "references": [
+        "GUID:9cf942d9fd96466892ae1af1f1fd1e99",
+        "GUID:5b69258f1f0745f49c0f61f9ed42f84d"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

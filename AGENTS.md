@@ -6,7 +6,7 @@ This repo contains **two projects**:
 **Unity 6 Game** — `KiarcheContinuumWar/`
 - Core gameplay code: `Assets/Scripts/` split by domain: `Units/`, `Pathfinding/`, `Map/`, `Pooling/`, `Managers/`, `UI/`, `CameraSystem/`, `InputSystem/`, `Core/`, and editor automation in `Editor/`.
 - Scenes: `Assets/Scenes/` (main working scenes: `MVP_Prototype.unity`, `TestMap.unity`; auxiliary: `SampleScene.unity`). Prefabs: `Assets/Prefabs/`. Settings: `ProjectSettings/`.
-- No `.asmdef` files — relies on default Unity assembly compilation.
+- Runtime and test boundaries may use targeted `.asmdef` files where the project needs isolated compilation or automated tests.
 
 **React Docs Web App** — `documentation/kcwweb/`
 - React 19 + TypeScript 5.9 + Vite 8 + React Router 7 SPA.
@@ -20,6 +20,8 @@ This repo contains **two projects**:
 ### Unity (editor workflows)
 - Open `KiarcheContinuumWar/` in Unity `6000.4.0f1`.
 - Play `Assets/Scenes/MVP_Prototype.unity` to test.
+- Run EditMode tests: `powershell -ExecutionPolicy Bypass -File scripts\run-unity-editmode-tests.ps1`
+- Run PlayMode tests: `powershell -ExecutionPolicy Bypass -File scripts\run-unity-editmode-tests.ps1 -TestPlatform PlayMode`
 - Debug shortcuts: `T` (toggle), `P` (pathfinding), `R` (reset) — see `Assets/Scripts/README.md`.
 - Editor tools: `Tools > KCW > Create Unit Prefab`, `Generate MVP Scene`, `Generate Test Map`.
 
@@ -31,7 +33,7 @@ npm run build        # TypeScript check + production bundle (tsc -b && vite buil
 npm run lint         # Run ESLint (eslint .)
 npm run preview      # Serve production build locally
 ```
-Treat `npm run build` and `npm run lint` as the minimum verification before opening a PR. There is no automated test suite — `npm run build` serves as the type-check gate.
+Treat `npm run build` and `npm run lint` as the minimum verification before opening a PR. If a web-code task changes behavior, the task must also add or update unit tests for the touched logic.
 
 ## Coding Style & Conventions
 
@@ -41,6 +43,7 @@ Treat `npm run build` and `npm run lint` as the minimum verification before open
 - **Namespaces**: `KiarcheContinuumWar.*` matching feature folder.
 - **Organization**: One class per file, file name matches class name. Place scripts in matching domain folder.
 - **Unity patterns**: Use `[SerializeField] private` for inspector-exposed fields. Keep `[RequireComponent]` and `[DisallowMultipleComponent]` where applicable.
+- **Comments**: add concise comments for non-obvious logic, invariants, lifecycle assumptions, data contracts, and editor/runtime caveats. Do not add noise comments that merely restate the next line of code.
 - **Error handling**: Use `Debug.LogError` / `Debug.LogWarning` for runtime issues. Guard null references early with `if (x == null) return`.
 
 ### TypeScript/React
@@ -52,12 +55,31 @@ Treat `npm run build` and `npm run lint` as the minimum verification before open
 - **CSS**: Co-located `.css` files per page/component. Use CSS variables for theming (dark theme, purple accents, mobile-first responsive).
 - **Data**: All content in `src/data/` typed via `src/types/index.ts`. Components consume data, never embed it.
 - **React toolchain**: Preserve the existing React Compiler setup (`@vitejs/plugin-react` plus `@rolldown/plugin-babel` with `reactCompilerPreset`) unless the task explicitly requires changing build tooling.
+- **Comments**: add concise comments for non-obvious state flow, rendering assumptions, edge cases, data transformations, and integration contracts. Do not add line-by-line narration of obvious code.
 - **Error handling**: Use React error boundaries where appropriate. Log with `console.error` for unexpected states.
 
 ## Testing Guidelines
-No automated test suite exists. Validate changes manually:
-- **Unity**: Playtest in `MVP_Prototype.unity` and `TestMap.unity`. Use debug shortcuts.
-- **Web App**: Run `npm run build` (type checks) and `npm run lint` before committing. Visually verify pages via `npm run dev`.
+Code changes must be covered by unit tests. This is mandatory for new features, bug fixes, refactors, and behavior-changing maintenance work.
+
+- A coding task is not complete until relevant unit tests are added or updated and executed successfully.
+- Missing unit tests for changed code are a workflow failure, not an optional follow-up.
+- If the touched area does not yet have a usable unit-test harness, adding the minimal harness required to test that code becomes part of the same task.
+- If no meaningful unit test can be written, treat that as a blocker to escalate explicitly; do not silently ship untested code.
+- Non-code tasks may use other verification appropriate to scope, but they do not relax the unit-test requirement for code changes.
+- **Unity**: run the relevant EditMode and/or PlayMode unit tests, then perform Unity MCP verification before considering the task complete.
+- **Web App**: run unit tests for changed code in addition to `npm run build` and `npm run lint`; use browser verification when the change affects rendered UI, text, routing, or interactions.
+- **Manual checks** support automated tests, but they do not replace required unit-test coverage for code changes.
+
+## Documentation Guidelines
+Code changes must also update documentation and required code comments. This is part of the same task, not follow-up polish.
+
+- A code task is not complete until the relevant adjacent documentation is added or updated.
+- The documentation target should be the closest durable source of truth for that code: feature README, module notes, architecture docs, runbook, or other repo-local reference used during future tasks.
+- If behavior, contracts, configuration, assumptions, data flow, setup steps, or debugging workflow changed, the related documentation must change in the same task.
+- If the touched area has no usable local documentation, creating the minimal adjacent documentation becomes part of the task.
+- New or changed non-trivial code must include concise comments for intent, invariants, edge cases, integration points, and other information that is not obvious from the code alone.
+- Comments should explain `why`, constraints, or caveats. They must not devolve into noisy line-by-line paraphrases.
+- Non-code tasks may be `not_applicable` for code comments, but they do not waive the documentation requirement if the task changes operational knowledge or workflows.
 
 ## Agent Instructions
 - **Always use Context7 for Unity questions** before answering from memory. This applies to Unity API usage, editor workflows, package setup, lifecycle methods, Input System, URP, and version-specific behavior.
@@ -85,7 +107,7 @@ No automated test suite exists. Validate changes manually:
 
 ## Multi-Agent Orchestration
 - Planning is mandatory before implementation, even if the task initially looks small.
-- Start every task with a short triage: goal, affected area, expected verification, dependency/risk check, and whether delegation is justified.
+- Start every task with a short triage: goal, affected area, expected verification, required unit-test scope, documentation scope, comment expectations, dependency/risk check, and whether delegation is justified.
 - Default behavior: keep the critical path local, delegate only bounded side tasks or clearly separable implementation slices.
 - Spawn sub-agents when the task naturally splits by project area, verification track, or documentation/research stream.
 - Prefer **parallel** sub-agents when work has disjoint ownership and does not block the immediate next local step.
@@ -102,16 +124,36 @@ No automated test suite exists. Validate changes manually:
 - The plan review pass may be skipped only for repeatable, low-ambiguity workflows where ownership, verification, and task decomposition already follow an established pattern and no new cross-domain risk is introduced.
 - If planning reveals cross-domain impact, switch from local execution to multi-agent orchestration.
 - If verification is unclear, planning is incomplete and implementation should not start yet.
+- If a code task does not yet have a concrete unit-test plan, planning is incomplete and implementation should not start yet.
+- If a code task does not yet have a concrete documentation/comment plan, planning is incomplete and implementation should not start yet.
 
 ### Context Isolation Standard
 - Every task must receive a stable `task_id` before delegation or multi-step execution.
 - Every task must define a `context_scope`: owned folders/files, excluded areas, and the agent responsible for each owned area.
-- Every task must start with a `context_snapshot`: goal, current facts, constraints, verification method, and open questions.
+- Every task must start with a `context_snapshot`: goal, current facts, constraints, verification method, unit-test expectations, documentation references, comment expectations, and open questions.
 - Every handoff between agents must use a `handoff contract`: completed work, incomplete work, changed files, verification status, and remaining risks.
 - Every rework cycle must increment a `context_version` so agents know they are working from updated state, not the original prompt.
 - Do not pass full conversational history to workers when a scoped snapshot is sufficient.
 - If two agents need the same file, stop and re-plan ownership before execution.
 - Use a modular template set rather than one rigid task form: `Lite`, `Standard`, `Exploration`, and `Handoff`.
+
+### Model And Reasoning Policy
+- For implementation and development work, the default `reasoning_effort` is `high`.
+- This default applies to local implementation on the critical path and to development-focused workers such as Agent A, Agent B, Agent C, Agent D, and Agent G.
+- Repo-wide role defaults:
+  - Agent A: `high`
+  - Agent B: `high`
+  - Agent C: `high`
+  - Agent D: `high`
+  - Agent E: `medium`
+  - Agent F: `medium`
+  - Agent G: `high`
+  - Agent H: `high`
+  - Agent I: `medium`
+  - Agent J: `medium`
+- Do not use `xhigh` as a default role level.
+- Use `xhigh` only as an explicit override for rare cases such as a complex architectural refactor, a stubborn cross-domain defect, or a release-blocking investigation where `high` is not sufficient.
+- If a task overrides the default model or reasoning level, record that override in the task template or handoff so the choice is visible to the next agent.
 
 ### Recommended Agent Roles
 - **Unity gameplay agent**: `KiarcheContinuumWar/Assets/Scripts/Units/`, `Managers/`, `Core/`, combat logic, unit behaviors, scene gameplay wiring.
@@ -138,8 +180,8 @@ No automated test suite exists. Validate changes manually:
 - **Agent I — Browser And Playwright**: worker for MCP Playwright verification, route walkthroughs, page-level smoke tests, interaction checks, and post-deploy browser validation.
 
 ### Delegation Rules By Task Type
-- **Unity-only feature**: use one focused Unity agent; after implementation, always run a Unity MCP verification pass before considering the task done. Add a second verification agent if the change is broad or risky.
-- **Web-only feature**: use one web docs agent; add a review agent for build/lint follow-up if needed.
+- **Unity-only feature**: use one focused Unity agent; the task must add or update unit tests, adjacent documentation, and required code comments for changed code, then run those tests and a Unity MCP verification pass before considering the task done. Add a second verification agent if the change is broad or risky.
+- **Web-only feature**: use one web docs agent; the task must add or update unit tests, adjacent documentation, and required code comments for changed code, and may add a review agent for build/lint follow-up if needed.
 - **Web UI verification**: use the Browser/Playwright agent when correctness depends on rendered routes, interactions, modal flows, navigation, or post-deploy page checks.
 - **Deployment preparation**: use the web docs agent for app changes and the Dev-Ops agent for packaging and VPS rollout assets.
 - **Commit/release preparation**: use the Git agent after implementation when changes need clean grouping, reviewable diffs, or release-ready handoff.
@@ -204,18 +246,20 @@ No automated test suite exists. Validate changes manually:
 
 ### Iteration Policy
 - Use a verification loop when work includes testing, review, or user-reported bug reproduction.
-- Standard loop: `implement -> test/review -> fix -> re-test`.
+- Standard loop: `implement -> add/update unit tests/docs/comments -> run tests/review -> fix -> re-test`.
 - If a defect is found, send it back to the responsible domain agent for another iteration.
-- For Unity work, the verification step must use Unity MCP before the task is considered complete.
+- For code tasks, passing unit tests are required before the task is considered complete.
+- For code tasks, updated documentation and required code comments are required before the task is considered complete.
+- For Unity work, the verification step must use Unity MCP after unit tests before the task is considered complete.
 - If the same task reaches more than **3 iterations**, stop the autonomous loop and ask the user for help before continuing.
 - After the third failed iteration, summarize what was tried, what failed, and which assumptions or constraints are blocking progress.
 
 ### Review Role Split
 - `Agent J` reviews plan quality before implementation.
-- `Agent H` reviews implementation results, regressions, and verification outcomes after or alongside execution.
+- `Agent H` reviews implementation results, regressions, unit-test adequacy, documentation adequacy, comment adequacy, and verification outcomes after or alongside execution.
 - Do not use `Agent H` as a substitute for the mandatory pre-implementation plan review when `Agent J` is required.
 
 ## Commit & Pull Request Guidelines
 - **Commits**: Imperative, scope-first subjects (e.g., `Add movement`, `Fix menu layout`). Avoid placeholders like `123`.
 - **Branches**: `feature/*`, `fix/*`, `docs/*`.
-- **PRs must include**: short description of the change, linked issue/task ID when available, screenshots/clips for scene/UI/docs-page changes, and verification method (`Unity playtest`, `npm run build`, `npm run lint`).
+- **PRs must include**: short description of the change, linked issue/task ID when available, screenshots/clips for scene/UI/docs-page changes, verification method including the unit tests that were added or run, and the documentation that was added or updated.

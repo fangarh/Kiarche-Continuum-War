@@ -1,0 +1,24 @@
+{
+    "name": "KiarcheContinuumWar.Tests.EditMode",
+    "rootNamespace": "",
+    "references": [
+        "GUID:9cf942d9fd96466892ae1af1f1fd1e99",
+        "GUID:8a8b88f654f643f1989e663fa5fe056a"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -38,7 +38,8 @@ Assets/Scripts/
 ├── CameraSystem/
 │   └── RTSCamera.cs              # RTS камера (WSAD, зум)
 ├── Core/
-│   └── ResourceManager.cs        # Управление ресурсами
+│   ├── ResourceManager.cs        # Управление ресурсами
+│   └── KiarcheContinuumWar.Core.Runtime.asmdef
 ├── Editor/
 │   ├── CreateUnitPrefabEditor.cs # Tools → KCW → Create Unit Prefab
 │   ├── GenerateMVPScene.cs       # Tools → KCW → Generate MVP Scene
@@ -53,11 +54,16 @@ Assets/Scripts/
 │   ├── MapManager.cs             # Данные карты (размер, границы, спавны)
 │   └── Obstacle.cs               # Препятствие (регистрация в FlowField)
 ├── Pathfinding/
-│   ├── FlowField.cs              # Поле потока (ячейки, направления)
+│   ├── Runtime/
+│   │   ├── FlowField.cs          # Поле потока (ячейки, направления)
+│   │   └── KiarcheContinuumWar.Pathfinding.Runtime.asmdef
 │   ├── FlowFieldManager.cs       # Генерация поля от цели (BFS)
 │   └── UnitPathfinder.cs         # Движение юнита по полю
 ├── Pooling/
-│   ├── ObjectPool.cs             # Универсальный пул объектов
+│   ├── ObjectPool.cs             # Заглушка-перенаправление на runtime-assembly
+│   ├── Runtime/
+│   │   ├── ObjectPool.cs         # Универсальный пул объектов
+│   │   └── KiarcheContinuumWar.Pooling.Runtime.asmdef
 │   └── UnitPoolManager.cs        # Менеджер пула юнитов
 ├── UI/
 │   └── GameUI.cs                 # HUD: ресурсы, выделение
@@ -207,3 +213,54 @@ Assets/Scripts/
 - [x] **task-019** — Базовая RTS камера (орбита, зум) ✅
 - [ ] **task-010** — Прототип боя (столкновение групп)
 - [ ] **task-020** — Тест производительности (400 юнитов)
+
+---
+
+## Automated Tests
+
+В проект добавлена базовая инфраструктура Edit Mode unit-тестов на Unity Test Framework.
+
+Что уже есть:
+- `Packages/manifest.json` теперь явно фиксирует `com.unity.test-framework`.
+- `FlowField` вынесен в отдельную runtime-assembly `Assets/Scripts/Pathfinding/Runtime/`.
+- `ResourceManager` вынесен в runtime-assembly `Assets/Scripts/Core/`.
+- `ObjectPool` вынесен в runtime-assembly `Assets/Scripts/Pooling/Runtime/`.
+- Edit Mode тесты лежат в `Assets/Tests/EditMode/Editor/FlowFieldTests.cs`.
+- Edit Mode тесты на пул лежат в `Assets/Tests/EditMode/Editor/ObjectPoolEditModeTests.cs`.
+- Play Mode тесты лежат в `Assets/Tests/PlayMode/FlowFieldPlayModeTests.cs`.
+- Play Mode тесты на ресурсы лежат в `Assets/Tests/PlayMode/ResourceManagerPlayModeTests.cs`.
+- Для batch-mode запуска используется `scripts/run-unity-editmode-tests.ps1` с параметром `-TestPlatform`.
+- Для CI добавлен workflow `.github/workflows/unity-tests.yml`.
+
+Как запускать:
+1. В Editor: `Window -> General -> Test Runner -> EditMode`.
+2. Из PowerShell из корня репозитория:
+
+```powershell
+.\scripts\run-unity-editmode-tests.ps1
+```
+
+Play Mode:
+
+```powershell
+.\scripts\run-unity-editmode-tests.ps1 -TestPlatform PlayMode
+```
+
+При необходимости можно передать путь к Unity Editor:
+
+```powershell
+.\scripts\run-unity-editmode-tests.ps1 -UnityPath "C:\Program Files\Unity\Hub\Editor\6000.4.0f1\Editor\Unity.exe"
+```
+
+Результаты batch-mode тестов пишутся в:
+- `test-results/unity/editmode-results.xml`
+- `test-results/unity/editmode.log`
+- `test-results/unity/playmode-results.xml`
+- `test-results/unity/playmode.log`
+
+Требование:
+- Для batch-mode запуска Unity Editor должен быть активирован на машине, иначе тесты завершатся ошибкой лицензии до компиляции/прогона.
+
+CI:
+- GitHub Actions workflow запускает `editmode` и `playmode` через `game-ci/unity-test-runner@v4`.
+- Для CI нужно настроить секреты `UNITY_LICENSE`, `UNITY_EMAIL`, `UNITY_PASSWORD`, а при серийной лицензии ещё и `UNITY_SERIAL`.

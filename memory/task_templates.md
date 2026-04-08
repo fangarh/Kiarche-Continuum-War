@@ -29,6 +29,9 @@ task_id:
 context_version:
 task_type:
 goal:
+execution_profile:
+test_strategy:
+documentation_strategy:
 verification:
 ```
 
@@ -38,7 +41,32 @@ verification:
 - `context_version`: версия текущего состояния задачи.
 - `task_type`: `lite`, `standard`, `exploration`, `handoff`.
 - `goal`: какой результат нужен.
+- `execution_profile`: какой `model` / `reasoning_effort` используется для primary execution и какие есть overrides.
+- `test_strategy`: какие unit tests обязательны, что именно покрывается, какие команды запускаются, или почему это `not_applicable`.
+- `documentation_strategy`: какие docs нужно обновить, какие комментарии обязательны, какие adjacent references становятся source of truth, или почему это `not_applicable`.
 - `verification`: как понять, что задача выполнена.
+
+Для любой задачи, которая меняет код, `test_strategy` обязана требовать unit tests.
+Пустое `test_strategy`, `manual only` или перенос тестов "на потом" для code-change задачи недопустимы.
+Если тестового контура в затронутой зоне нет, `test_strategy` должна включать создание минимально достаточного test harness в рамках той же задачи.
+Для любой задачи, которая меняет код, `documentation_strategy` обязана требовать обновление документации и required comments.
+Пустое `documentation_strategy` или перенос docs/comments "на потом" для code-change задачи недопустимы.
+Если у затронутой зоны нет usable local docs, `documentation_strategy` должна включать создание минимальной adjacent documentation в рамках той же задачи.
+
+Базовые role defaults:
+
+- Agent A: `high`
+- Agent B: `high`
+- Agent C: `high`
+- Agent D: `high`
+- Agent E: `medium`
+- Agent F: `medium`
+- Agent G: `high`
+- Agent H: `high`
+- Agent I: `medium`
+- Agent J: `medium`
+
+`xhigh` не использовать как дефолт. Его можно указывать только как явный override для редких задач повышенной сложности.
 
 Дополнительные session-поля могут использоваться для narrative/lore задач:
 
@@ -65,6 +93,20 @@ task_id:
 context_version: v1
 task_type: lite
 goal:
+execution_profile:
+  primary_reasoning_effort: high
+test_strategy:
+  unit_tests: required | not_applicable
+  scope:
+    - ...
+  commands:
+    - ...
+documentation_strategy:
+  docs: required | not_applicable
+  comment_scope:
+    - ...
+  docs_to_update:
+    - ...
 scope:
   owned:
     - ...
@@ -80,6 +122,8 @@ notes:
 - `context_version`
 - `task_type`
 - `goal`
+- `test_strategy`
+- `documentation_strategy`
 - `scope.owned`
 - `verification`
 
@@ -101,6 +145,22 @@ task_id:
 context_version: v1
 task_type: standard
 goal:
+execution_profile:
+  primary_reasoning_effort: high
+  overrides:
+    - Agent ...: ...
+test_strategy:
+  unit_tests: required | not_applicable
+  scope:
+    - ...
+  commands:
+    - ...
+documentation_strategy:
+  docs: required | not_applicable
+  comment_scope:
+    - ...
+  docs_to_update:
+    - ...
 context_scope:
   owned:
     - ...
@@ -120,6 +180,8 @@ context_snapshot:
     - ...
   constraints:
     - ...
+  documentation_refs:
+    - ...
   open_questions:
     - ...
 plan:
@@ -136,12 +198,15 @@ risks:
 - `context_scope`;
 - `context_snapshot`;
 - `plan`;
+- `test_strategy`;
+- `documentation_strategy`;
 - `risks`.
 
 Если используется `Agent J`, в `Standard` задаче желательно явно фиксировать:
 
 - `plan_review_status`: `pending`, `approved`, `approved_with_risks`, `refine`, `skipped`;
 - `plan_review_findings`: краткие замечания или основание для `skipped`.
+- `execution_profile.overrides`: если support-agent работает не на дефолтном уровне для своей роли.
 
 `support_agents` использовать, если задаче нужны:
 
@@ -150,6 +215,9 @@ risks:
 - `Agent G` для deploy/VPS rollout preparation.
 - `Agent I` для MCP Playwright browser verification.
 - Unity MCP verification pass для Unity runtime/editor проверки после реализации.
+
+`Agent J` должен считать план неполным, если для code-change задачи не описан `test_strategy`.
+`Agent J` должен считать план неполным, если для code-change задачи не описан `documentation_strategy`.
 
 ## Exploration
 
@@ -169,6 +237,22 @@ task_id:
 context_version: v1
 task_type: exploration
 goal:
+execution_profile:
+  primary_reasoning_effort:
+test_strategy:
+  unit_tests:
+    status: pending
+    questions:
+      - ...
+documentation_strategy:
+  docs:
+    status: pending
+    questions:
+      - ...
+  comments:
+    status: pending
+    questions:
+      - ...
 known_facts:
   - ...
 unknowns:
@@ -191,10 +275,15 @@ verification:
 
 - `Exploration` не требует финального ownership с самого начала;
 - после исследования задача должна быть переведена в `Lite` или `Standard`.
+- Если exploration касается code-change задачи, она должна завершиться понятным планом unit-test покрытия до перехода в реализацию.
+- Если exploration касается code-change задачи, она должна завершиться понятным планом documentation updates и comment scope до перехода в реализацию.
 
 Если проблема проявляется только в браузере, exploration должна явно зафиксировать, что нужна MCP Playwright verification.
 Если после исследования формируется план реализации, для `Exploration -> Lite/Standard` допускается одна ревизия плана через Agent J перед стартом исполнения.
 Если ревизия пропущена, в следующем шаблоне нужно явно указать основание для `skipped`.
+Если exploration переходит в реализацию, в следующем шаблоне нужно явно зафиксировать `primary_reasoning_effort`; для implementation/development по умолчанию это `high`.
+Если exploration переходит в code-change реализацию, в следующем шаблоне нужно явно зафиксировать unit-test scope и test commands.
+Если exploration переходит в code-change реализацию, в следующем шаблоне нужно явно зафиксировать docs to update и comment scope.
 
 ## Handoff
 
@@ -216,12 +305,19 @@ task_type: handoff
 from:
 to:
 goal:
+execution_profile:
+test_strategy:
+documentation_strategy:
 handoff_contract:
   completed:
     - ...
   remaining:
     - ...
   changed_files:
+    - ...
+  test_status:
+    - ...
+  documentation_status:
     - ...
   verification_status:
     - ...
@@ -242,6 +338,18 @@ handoff_contract:
 - `from`
 - `to`
 - `handoff_contract`
+
+Для code-change handoff поле `test_status` должно явно отвечать:
+
+- какие unit tests добавлены или обновлены;
+- какие test commands уже прошли;
+- что еще осталось допокрыть, если handoff идет до финала.
+
+Для code-change handoff поле `documentation_status` должно явно отвечать:
+
+- какие docs были добавлены или обновлены;
+- какие code comments были добавлены или пересмотрены;
+- какие knowledge gaps еще остались, если handoff идет до финала.
 
 `deployment_notes` и `git_notes` обязательны только если handoff связан с релизом, деплоем или подготовкой к передаче на VPS.
 
@@ -287,10 +395,13 @@ checkpoint_ready: false
 - `browser` — MCP Playwright route/UI/interactions verification;
 - `hybrid` — сначала command, потом browser.
 
+Для code-change задач verification не должна ограничиваться только build/lint/manual checks; passing unit tests обязательны.
+Для code-change задач verification не должна ограничиваться только tests/build/lint/manual checks; updated docs и required comments обязательны.
+
 Для Unity задач verification желательно уточнять отдельно:
 
 - `unity-mcp` — Unity MCP console/scene/runtime/editor verification;
-- `hybrid-unity` — локальные проверки или review плюс обязательная Unity MCP verification.
+- `hybrid-unity` — unit tests и локальные проверки или review плюс обязательная Unity MCP verification.
 
 Для Unity MCP findings желательно дополнительно указывать:
 
@@ -308,6 +419,14 @@ checkpoint_ready: false
 - локализованные строки;
 
 то verification не должна оставаться только `command`.
+
+Если задача меняет код:
+
+- `test_strategy.unit_tests` не может быть `optional`;
+- `documentation_strategy.docs` не может быть `optional`;
+- отсутствие тестового контура должно трактоваться как часть scope текущей задачи;
+- отсутствие usable local docs должно трактоваться как часть scope текущей задачи;
+- handoff без `test_status` и `documentation_status` допустим только для `not_applicable` задач без code changes.
 
 ## Правила перехода между режимами
 
