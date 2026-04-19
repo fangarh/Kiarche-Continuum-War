@@ -1,5 +1,5 @@
 [mcp_servers.unity-mcp]
-command = 'C:\Users\Admin\.unity\relay\relay_win.exe'
+command = 'C:\Users\Fangarh\.unity\relay\relay_win.exe'
 args = ["--mcp"]
 
 [mcp_servers.unity-mcp.tools.Unity_GetConsoleLogs]
@@ -9,4 +9,36 @@ approval_mode = "approve"
 approval_mode = "approve"
 
 [mcp_servers.unity-mcp.tools.Unity_RunCommand]
+approval_mode = "approve"
+
+[mcp_servers.unity-mcp.tools.Unity_SceneView_CaptureMultiAngleSceneView]
+approval_mode = "approve"
+
+
+[mcp_servers.blender3]
+command = "uvx"
+args = ["blender-mcp"]
+
+[mcp_servers.blender3.tools.get_scene_info]
+approval_mode = "approve"
+
+[mcp_servers.blender3.tools.get_polyhaven_status]
+approval_mode = "approve"
+
+[mcp_servers.blender3.tools.get_sketchfab_status]
+approval_mode = "approve"
+
+[mcp_servers.blender3.tools.get_hunyuan3d_status]
+approval_mode = "approve"
+
+[mcp_servers.blender3.tools.get_hyper3d_status]
+approval_mode = "approve"
+
+[mcp_servers.blender3.tools.execute_blender_code]
+approval_mode = "approve"
+
+[mcp_servers.blender3.tools.get_object_info]
+approval_mode = "approve"
+
+[mcp_servers.blender3.tools.get_viewport_screenshot]
 approval_mode = "approve"
