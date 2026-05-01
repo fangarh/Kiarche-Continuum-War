@@ -1,5 +1,30 @@
-import Image from "next/image";
 import { landingContent } from "./landing-content";
+
+const characterImageSizes =
+    "(max-width: 760px) calc(100vw - 32px), (max-width: 1120px) calc((100vw - 66px) / 2), 410px";
+
+function getOptimizedCharacterSrc(imageUrl: string, width: number) {
+    return imageUrl.replace("/heroes/", "/heroes/optimized/").replace(".png", `-${width}.webp`);
+}
+
+function CharacterImage({ imageUrl, alt }: { imageUrl: string; alt: string }) {
+    const srcSet = [480, 720, 960]
+        .map((width) => `${getOptimizedCharacterSrc(imageUrl, width)} ${width}w`)
+        .join(", ");
+
+    return (
+        <picture className="character-picture">
+            <source type="image/webp" srcSet={srcSet} sizes={characterImageSizes} />
+            <img
+                src={getOptimizedCharacterSrc(imageUrl, 720)}
+                alt={alt}
+                loading="lazy"
+                decoding="async"
+                className="character-image"
+            />
+        </picture>
+    );
+}
 
 function SectionHeader({
     eyebrow,
@@ -154,13 +179,7 @@ export default function HomePage() {
                     {heroes.cards.map((card) => (
                         <article className="character-card" key={card.name}>
                             <div className="character-media">
-                                <Image
-                                    src={card.imageUrl}
-                                    alt={card.name}
-                                    fill
-                                    sizes="(max-width: 760px) 100vw, (max-width: 1120px) 50vw, 33vw"
-                                    className="character-image"
-                                />
+                                <CharacterImage imageUrl={card.imageUrl} alt={card.name} />
                             </div>
                             <div className="character-content">
                                 <span className="character-faction">{card.faction}</span>
